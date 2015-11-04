@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'fileutils'
-require_relative '../etc/git-helper/git_helper'
+require_relative '../lib/git_helper'
 
 # Will remove a submodule from a repo
 class SubmoduleRemove

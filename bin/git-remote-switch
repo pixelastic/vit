@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require_relative '../etc/git-helper/git_helper'
+require_relative '../lib/git_helper'
 # Change a branch remote
 # Usage:
 # $ git remote-switch upstream
