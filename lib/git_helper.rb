@@ -8,15 +8,10 @@ module GitHelper
     branch_gone: 160,
     branch_bugfix: 203,
     branch_develop: 184,
-    branch_feature: 202,
-    branch_fix: 203,
     branch_gh_pages: 24,
     branch_heroku: 141,
     branch_master: 69,
-    branch_perf: 141,
     branch_release: 171,
-    branch_review: 28,
-    branch_test: 136,
     hash: 67,
     message: 250,
     remote: 202,
@@ -35,6 +30,7 @@ module GitHelper
   end
 
   def branch_color(branch)
+    return @@colors[:branch_gone] if branch_gone?(branch)
     return nil if branch.nil?
     color_symbol = ('branch_' + branch.gsub('-', '_')).to_sym
     return @@colors[color_symbol] if @@colors[color_symbol]
@@ -79,6 +75,7 @@ module GitHelper
   end
 
   def push_pull_indicator(branchName)
+    return ' ' if branch_gone?(branchName)
     system("git branch-remote-status #{branchName}")
     code = $CHILD_STATUS.exitstatus
     return ' ' if code == 1
@@ -139,6 +136,10 @@ module GitHelper
 
   def branch?(name)
     system("git branch-exists #{name}")
+  end
+
+  def branch_gone?(name)
+    system("git branch-gone #{name}")
   end
 
   def remote?(name)

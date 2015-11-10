@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+# Check if the specified branch has its upstream gone
+local branchName=$1
+if [[ $branchName = '' ]]; then
+  branchName=$(git-branch-current);
+fi
+
+# See if it matches:
+#   branchName aze5c87 [path/to/origin: gone]
+git branch -l -vv | grep "^..${branchName}\( *\)\(.*\) \[\(.*\): gone\]" &>/dev/null
