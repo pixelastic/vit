@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
+# Prune all local branches whose upstream is gone
+
+class GitPruneBranches
+  include GitHelper
+  def initialize(*args)
+    @dry_run = args.include?('-n')
+  end
+
+  def branches
+    branches = `git branch -l`.split("\n")
+    branches.map do |branch|
+      branch[2..-1]
+    end
+  end
+
+  def run
+    branches.each do |branch|
+      next unless branch_gone?(branch)
+      if @dry_run
+        puts "Dry run: Pruning #{branch}"
+      else
+        if current_branch == branch
+          puts "Can't prune #{branch}, this is current branch"
+          next
+        end
+        puts "Pruning #{branch}"
+        `git-branch-remove #{branch}`
+      end
+    end
+  end
+end
+GitPruneBranches.new(*ARGV).run
