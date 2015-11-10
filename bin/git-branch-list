@@ -9,7 +9,7 @@ class Branch
     @hash = data[:hash]
     @local_name = data[:local_name]
     @message = data[:message]
-    @is_broken = data[:is_broken] || false
+    @is_gone = data[:is_gone] || false
 
     @position = parse_position(data[:position])
     @remote = data[:remote]
@@ -35,7 +35,7 @@ class Branch
     end
 
     # Marker
-    if @is_broken
+    if @is_gone
       display << 'x'
     else
       display << push_pull_indicator(@local_name)
@@ -61,8 +61,8 @@ class GitBranchListAll
 
   def initialize(*args)
     @args = get_flag_args(args)
-    @is_displaying_broken_branches = @args.include?('-a')
-    @remote_branches = remote_branches if @is_displaying_broken_branches
+    @is_displaying_gone_branches = @args.include?('-a')
+    @remote_branches = remote_branches if @is_displaying_gone_branches
     @local_branches = local_branches
   end
 
@@ -80,22 +80,17 @@ class GitBranchListAll
       # message contains distant branch and ahead/behind information
       if message[0] == '['
         distant_name, _, position, message = message.match(/^\[([^ :]*)(: )?(.*)\] (.*)/).captures
+        is_branch_gone = (position == 'gone')
         split = distant_name.split('/')
         remote = split.shift
         distant_name = split.join('/')
-      end
-
-      # If `-a` is passed, we check if the distant branch is still here
-      is_branch_broken = false
-      if @is_displaying_broken_branches
-        is_branch_broken = true unless @remote_branches.include?(distant_name)
       end
 
       branches << Branch.new(
         local_name: local_name,
         distant_name: distant_name,
         remote: remote,
-        is_broken: is_branch_broken,
+        is_gone: is_branch_gone,
         hash: hash,
         position: position,
         message: message
@@ -123,8 +118,8 @@ class GitBranchListAll
       # Current branch
       line[0] = colorize(line[0], color(:valid))
       # Marker
-      if marker.strip == 'x' # Hackish way to know the branch is broken
-        line[1] = colorize(marker.gsub('x', ''), color(:branch_broken))
+      if marker.strip == 'x' # Hackish way to know the branch is gone
+        line[1] = colorize(marker.gsub('x', ''), color(:branch_gone))
       else
         line[1] = colorize(line[1], branch_color(branch_name.strip))
       end
