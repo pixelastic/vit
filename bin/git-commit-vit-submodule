@@ -3,5 +3,5 @@
 # chore(vit): Update vit submodule
 
 cd $(git root)
-git add ./scripts/bin/vit/private
+git add ./scripts/bin/vit
 git commit -m "chore(vit): Update vit submodule"
