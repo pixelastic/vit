@@ -4,6 +4,9 @@ vit lets you use `git` commands with a `vim` mindset.
 
 ## ⚠ WORK IN PROGRESS ⚠
 
+
+THIS IS A TEST
+
 _I'm doing RDD (Readme driven development) here, so do not trust everything you
 read, this is still under development and not production ready_
 
