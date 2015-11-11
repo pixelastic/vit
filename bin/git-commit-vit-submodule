@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+# Update the ./scripts/bin/vit submodule with message:
+# chore(vit): Update vit submodule
+
+cd $(git root)
+git add ./scripts/bin/vit/private
+git commit -m "chore(vit): Update vit submodule"
