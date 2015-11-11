@@ -13,7 +13,7 @@ class GitPullRequestCreate
   def initialize(*args)
     args = replace_short_aliases(args)
     default_owner = remote_owner(current_remote)
-    default_branch = 'develop'
+    default_branch = branch?('develop') ? 'develop' : 'master'
 
     # No arguments given, we create it on same owner, under develop
     if args.size == 0
@@ -52,6 +52,9 @@ class GitPullRequestCreate
   end
 
   def run
+    # First push, to correctly set the upstream
+    `git-branch-push`
+    # Then create the PR
     options = [
       "--submit #{@owner}",
       "--branch #{@branch}",
