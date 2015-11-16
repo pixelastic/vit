@@ -60,12 +60,10 @@ class GitPullRequestCreate
 
   def set_upstream
     remote_branch = "#{current_remote}/#{current_branch}"
-    `git branch --set-upstream #{current_branch} #{remote_branch}`
+    `git branch -u #{remote_branch}`
   end
 
   def run
-    # Set the upstream, so we know this is pushed
-    set_upstream
     # Then create the PR
     options = [
       "--submit #{@owner}",
@@ -73,6 +71,8 @@ class GitPullRequestCreate
       "--description #{description.shellescape}"
     ]
     `gh pr #{options.join(' ')}`
+    # Set the upstream, so we know this is pushed
+    set_upstream
   end
 end
 GitPullRequestCreate.new(*ARGV).run
