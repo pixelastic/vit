@@ -58,9 +58,14 @@ class GitPullRequestCreate
     `git log --pretty=format:'%b' #{@branch}...`.strip
   end
 
+  def set_upstream
+    remote_branch = "#{current_remote}/#{current_branch}"
+    `git branch --set-upstream #{current_branch} #{remote_branch}`
+  end
+
   def run
-    # First push, to correctly set the upstream
-    `git-branch-push`
+    # Set the upstream, so we know this is pushed
+    set_upstream
     # Then create the PR
     options = [
       "--submit #{@owner}",
