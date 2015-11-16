@@ -13,7 +13,6 @@ class GitPullRequestCreate
   def initialize(*args)
     args = replace_short_aliases(args)
     default_owner = remote_owner(current_remote)
-    default_branch = branch?('develop') ? 'develop' : 'master'
 
     # No arguments given, we create it on same owner, under develop
     if args.size == 0
@@ -44,6 +43,14 @@ class GitPullRequestCreate
       @owner = remote_owner(args[1])
       @branch = args[0]
     end
+  end
+
+  def default_branch
+    # If no branch specified, we use develop or master
+    branch = branch?('develop') ? 'develop' : 'master'
+    # If the origin is closer than the version we have, we use that one
+    branch_origin = "origin/#{branch}"
+    `git-commit-closer #{branch} #{branch_origin}`.strip
   end
 
   # Gets the full description (commit messages) since branch creation
