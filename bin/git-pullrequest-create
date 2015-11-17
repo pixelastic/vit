@@ -17,7 +17,7 @@ class GitPullRequestCreate
     # No arguments given, we create it on same owner, under develop
     if args.size == 0
       @owner = default_owner
-      @branch = default_branch
+      @branch = target_branch
       return
     end
 
@@ -25,7 +25,7 @@ class GitPullRequestCreate
     if args.size == 1
       if remote?(args[0])
         @owner = remote_owner(args[0])
-        @branch = default_branch
+        @branch = target_branch
         return
       end
       @owner = default_owner
@@ -45,17 +45,17 @@ class GitPullRequestCreate
     end
   end
 
-  def default_branch
+  def target_branch
     # If no branch specified, we use develop or master
-    branch = branch?('develop') ? 'develop' : 'master'
-    # If the origin is closer than the version we have, we use that one
-    branch_origin = "origin/#{branch}"
-    `git-commit-closer #{branch} #{branch_origin}`.strip
+    branch?('develop') ? 'develop' : 'master'
   end
 
   # Gets the full description (commit messages) since branch creation
   def description
-    `git log --pretty=format:'%b' #{@branch}...`.strip
+    # If the origin is closer than the local version, we use it
+    branch_origin = "origin/#{@branch}"
+    closer_branch  = `git-commit-closer #{@branch} #{branch_origin}`.strip
+    `git log --pretty=format:'%b' #{closer_branch}...`.strip
   end
 
   def set_upstream
@@ -71,6 +71,7 @@ class GitPullRequestCreate
       "--description #{description.shellescape}"
     ]
     `gh pr #{options.join(' ')}`
+
     # Set the upstream, so we know this is pushed
     set_upstream
   end
