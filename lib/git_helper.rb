@@ -126,6 +126,10 @@ module GitHelper
     tags.uniq
   end
 
+  def closer_commit(commitA, commitB)
+    `git-commit-closer #{commitA} #{commitB}`.strip
+  end
+
   def remote_owner(remote)
     `git-remote-owner #{remote}`.strip
   end

@@ -9,13 +9,22 @@ class GitBranchSquash
 
   def initialize(*args)
     args = replace_short_aliases(args)
-    @starting_point = args[0]
+    @starting_point = starting_point(args[0])
     if @starting_point.nil?
       puts 'You must specify the branch starting point'
       puts 'Usage:'
       puts '$ git-branch-squash develop'
       exit 1
     end
+  end
+
+  # When given a branch, will find the closer between the remote and local one
+  def starting_point(commit)
+    # This is not a known local branch, we use it directly
+    return commit unless branch?(commit)
+
+    remote_branch = "#{current_remote}/#{commit}"
+    closer_commit(commit, remote_branch)
   end
 
   def run
