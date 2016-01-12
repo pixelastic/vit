@@ -1,5 +1,6 @@
 require 'shellwords'
 require 'English'
+require 'awesome_print'
 
 # Allow access to current git repository state
 module GitHelper
@@ -134,7 +135,7 @@ module GitHelper
     `git-remote-owner #{remote}`.strip
   end
 
-  def remote_url(remote)
+  def remote_url(remote: nil)
     `git-remote-url #{remote}`.strip
   end
 

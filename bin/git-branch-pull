@@ -8,6 +8,7 @@ require_relative '../lib/git_helper'
 # $ git-branch-pull {origin} develop
 # $ git-branch-pull upstream develop
 # $ git-branch-pull develop upstream
+# $ git-branch-pull username:branch (on GitHub)
 class GitBranchPull
   include GitHelper
 
@@ -21,6 +22,24 @@ class GitBranchPull
     elements = guess_elements(@args)
     @remote_name = elements[:remote]
     @branch_name = elements[:branch] || elements[:unknown][0]
+
+    # Trying to pull a branch from another user on github
+    use_branch_as_github_fork(@branch_name) if @branch_name[':']
+  end
+
+  # Reads username:branchname string and create necessary remote
+  def use_branch_as_github_fork(github_fork)
+    username, @branch_name = github_fork.split(':')
+
+    @remote_name = username
+
+    # Create remote for user
+    unless remote?(@remote_name)
+      current_remote_url = remote_url
+      repo_name = current_remote_url.split('/')[1]
+      remote_url = "git@github.com:#{username}/#{repo_name}"
+      system("git-remote-create #{@remote_name} #{remote_url}")
+    end
   end
 
   def pull_unknown_branch
