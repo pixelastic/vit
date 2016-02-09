@@ -12,6 +12,11 @@ class SubmoduleCreate
     @repo_url = args[0]
     @submodule_path = args[1]
     @submodule_path = path_from_url(@repo_url) if @submodule_path.nil?
+
+    # Swap them if the path looks like a git url
+    if @submodule_path =~ /\.git$/
+      @repo_url, @submodule_path = @submodule_path, @repo_url
+    end
   end
 
   def path_from_url(url)
