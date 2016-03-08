@@ -15,7 +15,7 @@ class GitPullRequestCreate
     default_owner = remote_owner(current_remote)
 
     # No arguments given, we create it on same owner, under develop
-    if args.size == 0
+    if args.empty?
       @owner = default_owner
       @branch = target_branch
       return
@@ -53,8 +53,8 @@ class GitPullRequestCreate
   # Gets the full description (commit messages) since branch creation
   def description
     # If the origin is closer than the local version, we use it
-    branch_origin = "origin/#{@branch}"
-    closer_branch  = `git-commit-closer #{@branch} #{branch_origin}`.strip
+    branch_origin = "#{current_remote}/#{@branch}"
+    closer_branch = `git-commit-closer #{@branch} #{branch_origin}`.strip
     `git log --pretty=format:'%b' #{closer_branch}...`.strip
   end
 
