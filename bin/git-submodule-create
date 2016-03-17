@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
+require 'shellwords'
 
 # Will add a new submodule to a repo.
 # Usage :
 # $ git-submodule-path url@to:repo.git
 class SubmoduleCreate
   def initialize(*args)
-    if args.size == 0
+    if args.empty?
       puts '✘ You must pass at least the repository url'
       exit 1
     end
@@ -25,7 +26,8 @@ class SubmoduleCreate
   end
 
   def run
-    system("git submodule add #{@repo_url} #{@submodule_path}")
+    command = "git submodule add -b master #{@repo_url} #{@submodule_path.shellescape}"
+    system(command)
   end
 end
 
