@@ -60,7 +60,8 @@ class GitPullRequestCreate
 
   def set_upstream
     remote_branch = "#{current_remote}/#{current_branch}"
-    `git branch -u #{remote_branch}`
+    command = "git branch -u #{remote_branch}"
+    `#{command}`
   end
 
   def run
@@ -70,7 +71,8 @@ class GitPullRequestCreate
       "--branch #{@branch}",
       "--description #{description.shellescape}"
     ]
-    `gh pr #{options.join(' ')}`
+    command = "gh pr #{options.join(' ')}"
+    `#{command}`
 
     # Set the upstream, so we know this is pushed
     set_upstream
