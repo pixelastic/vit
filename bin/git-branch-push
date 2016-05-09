@@ -31,7 +31,9 @@ class GitRemotePush
     # branches with a different name
     branch = "#{current_branch}:#{@branch_name}"
 
-    system("git push #{@flags.join(' ')} #{@remote_name} #{branch}")
+    command = "git push #{@flags.join(' ')} #{@remote_name} #{branch}"
+
+    system(command)
   end
 end
 GitRemotePush.new(*ARGV).run
