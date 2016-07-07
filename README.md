@@ -7,6 +7,7 @@ vit lets you use `git` commands with a `vim` mindset.
 _I'm doing RDD (Readme driven development) here, so do not trust everything you
 read, this is still under development and not production ready_
 
+
 It adds a set of aliases inspired by `vim` to handle branches, commits, tags,
 files and much more.
 
