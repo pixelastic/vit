@@ -29,11 +29,11 @@ class GitRemotePush
 
     # Pushing to default remote for the first time
     if is_pushing_to_default_remote && never_pushed?
-      @flags << "--set-upstream #{@remote_name}" if never_pushed?
+      @flags << '--set-upstream' if never_pushed?
     end
 
     # Pushing to specific remote
-    @flags << "-u #{@remote_name}" unless is_pushing_to_default_remote
+    @flags << '-u' unless is_pushing_to_default_remote
 
     @flags += @args
 
@@ -41,7 +41,7 @@ class GitRemotePush
     # branches with a different name
     branch = "#{current_branch}:#{@branch_name}"
 
-    command = "git push #{@flags.join(' ')} #{branch}"
+    command = "git push #{@flags.join(' ')} #{@remote_name} #{branch}"
 
     system(command)
   end
