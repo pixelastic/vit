@@ -21,17 +21,27 @@ class GitRemotePush
     elements = guess_elements(@args)
     @remote_name = elements[:remote]
     @branch_name = elements[:branch]
+    @args -= [@remote_name, @branch_name]
   end
 
   def run
-    @flags << '--set-upstream' if never_pushed?
+    is_pushing_to_default_remote = (@remote_name == current_remote)
+
+    # Pushing to default remote for the first time
+    if is_pushing_to_default_remote && never_pushed?
+      @flags << "--set-upstream #{@remote_name}" if never_pushed?
+    end
+
+    # Pushing to specific remote
+    @flags << "-u #{@remote_name}" unless is_pushing_to_default_remote
+
     @flags += @args
 
     # We use the local-name:remote-name syntax for branches so we can push to
     # branches with a different name
     branch = "#{current_branch}:#{@branch_name}"
 
-    command = "git push #{@flags.join(' ')} #{@remote_name} #{branch}"
+    command = "git push #{@flags.join(' ')} #{branch}"
 
     system(command)
   end
