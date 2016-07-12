@@ -70,6 +70,10 @@ class GitDirectoryCreate
 
     # Add remote
     if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
+      # set-url does not seem to set the fetch value, so we manually put it
+      fetch_value = '+refs/heads/*:refs/remotes/origin/*'
+      `git config --add remote.origin.fetch '#{fetch_value}'`
+
       puts '✔ Remote origin set to GitHub'
     else
       puts '✘ Unable to set remote to GitHub'
@@ -80,7 +84,6 @@ class GitDirectoryCreate
   def push
     return if @is_dry_run
     if system('git push --set-upstream origin master &>/dev/null')
-      system('gh repo --browser')
       puts '✔ Pushed'
     else
       puts '✘ Unable to push'
