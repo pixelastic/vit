@@ -1,9 +1,32 @@
 require 'shellwords'
 require 'English'
+require 'open3'
 require 'awesome_print'
+require_relative './command_helper'
 
 # Allow access to current git repository state
 module GitHelper
+  include CommandHelper
+  
+  # Check if the directory is a git repository
+  def repository?(directory = nil)
+    command = 'git rev-parse'
+    directory = File.expand_path('.') if directory.nil?
+    
+    # Directory does not exist, so can't be a git one
+    return false unless File.exist?(directory)
+
+    # Special .git directory can't be considered a repo
+    return false if directory =~ /\.git/
+    
+    # We temporarily change dir if one is specified
+    previous_dir = File.expand_path('.')
+    Dir.chdir(directory)
+    success = command_success?(command)
+    Dir.chdir(previous_dir)
+    success
+  end
+
   @@colors = {
     branch: 202,
     branch_gone: 160,

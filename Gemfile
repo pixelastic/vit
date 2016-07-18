@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
+ruby '2.2.5'
 
 gem 'awesome_print', '~> 1.6'
 

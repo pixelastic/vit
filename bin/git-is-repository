@@ -1,19 +1,19 @@
-#!/usr/bin/env zsh
-# Check if specified path is a git repo
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
 
-local targetPath=$1
+# Checks if the specified directory is a git repository
+# Usage:
+#   $ git is-repository 
+#   $ git is-repository ./filepath
+class GitIsRepository
+  include GitHelper
+  def initialize(*args)
+    @target = args[0]
+  end
 
-# Set as current path as default
-if [[ $targetPath = '' ]]; then
-  targetPath=.
-fi
-
-# Getting the full path
-targetPath=${targetPath:a}
-
-# The .git directory is clearly not a repository
-if [[ $targetPath =~ '/\.git' ]]; then
-  exit 1
-fi
-
-cd $targetPath && git rev-parse &>/dev/null
+  def run
+    exit 1 unless repository?(@target)
+    exit 0
+  end
+end
+GitIsRepository.new(*ARGV).run
