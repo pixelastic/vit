@@ -36,7 +36,7 @@ describe(GitHelper) do
       move_out_of_directory
 
       # When
-      actual = test_instance.repository?(@tmp_repo)
+      actual = test_instance.repository?(@repo_path)
 
       # Then
       expect(actual).to eq false
@@ -48,7 +48,7 @@ describe(GitHelper) do
       move_out_of_directory
 
       # When
-      actual = test_instance.repository?(@tmp_repo)
+      actual = test_instance.repository?(@repo_path)
 
       # Then
       expect(actual).to eq true
@@ -113,5 +113,90 @@ describe(GitHelper) do
 
     # it 'returns true when in a submodule' do
     # end
+  end
+
+  describe 'repo_root' do
+    it 'should return the current path when in the root' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.repo_root
+
+      # Then
+      expect(actual).to eq @repo_path
+    end
+
+    it 'should return the root when in a subdirectory' do
+      # Given
+      create_repository
+      create_and_move_to_subdirectory
+
+      # When
+      actual = test_instance.repo_root
+
+      # Then
+      expect(actual).to eq @repo_path
+    end
+
+    it 'should return nil if not in a repo' do
+      # Given
+      create_directory
+
+      # When
+      actual = test_instance.repo_root
+
+      # Then
+      expect(actual).to eq nil
+    end
+
+    it 'should return the path when given path to a repo' do
+      # Given
+      create_repository
+      move_out_of_directory
+
+      # When
+      actual = test_instance.repo_root(@repo_path)
+
+      # Then
+      expect(actual).to eq @repo_path
+    end
+
+    it 'should return the root when given path a subdirectory of a repo' do
+      # Given
+      create_repository
+      create_and_move_to_subdirectory
+      move_out_of_directory
+
+      # When
+      actual = test_instance.repo_root(@repo_subdir_path)
+
+      # Then
+      expect(actual).to eq @repo_path
+    end
+
+    it 'should return nil when given the path to a normal directory' do
+      # Given
+      create_directory
+      move_out_of_directory
+
+      # When
+      actual = test_instance.repo_root(@repo_path)
+
+      # Then
+      expect(actual).to eq nil
+    end
+
+    it 'should return the nil when in the special .git folder' do
+      # Given
+      create_repository
+      Dir.chdir('./.git/objects')
+
+      # When
+      actual = test_instance.repo_root
+
+      # Then
+      expect(actual).to eq nil
+    end
   end
 end

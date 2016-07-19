@@ -7,18 +7,18 @@ require_relative './command_helper'
 # Allow access to current git repository state
 module GitHelper
   include CommandHelper
-  
+
   # Check if the directory is a git repository
   def repository?(directory = nil)
     command = 'git rev-parse'
     directory = File.expand_path('.') if directory.nil?
-    
+
     # Directory does not exist, so can't be a git one
     return false unless File.exist?(directory)
 
     # Special .git directory can't be considered a repo
     return false if directory =~ /\.git/
-    
+
     # We temporarily change dir if one is specified
     previous_dir = File.expand_path('.')
     Dir.chdir(directory)
@@ -26,6 +26,20 @@ module GitHelper
     Dir.chdir(previous_dir)
     success
   end
+
+  # Returns the path to the repo root
+  def repo_root(directory = nil)
+    directory = File.expand_path('.') if directory.nil?
+    return nil unless repository?(directory)
+
+    previous_dir = File.expand_path('.')
+    Dir.chdir(directory)
+    output = command_stdout('git root')
+    Dir.chdir(previous_dir)
+    output
+  end
+
+
 
   @@colors = {
     branch: 202,
@@ -56,7 +70,7 @@ module GitHelper
   def branch_color(branch)
     return @@colors[:branch_gone] if branch_gone?(branch)
     return nil if branch.nil?
-    color_symbol = ('branch_' + branch.gsub('-', '_')).to_sym
+    color_symbol = ('branch_' + branch.tr('-', '_')).to_sym
     return @@colors[color_symbol] if @@colors[color_symbol]
     @@colors[:branch]
   end
@@ -122,10 +136,6 @@ module GitHelper
 
   def submodule?(path)
     system("git-is-submodule #{path.shellescape}")
-  end
-
-  def repo_root
-    `git root`.strip
   end
 
   def current_branch
@@ -236,11 +246,10 @@ module GitHelper
         next
       end
 
-      if branch?(element) && !output.key?(:branch)
-        output[:branch] = element
-        initial_elements.delete(element)
-        next
-      end
+      next unless branch?(element) && !output.key?(:branch)
+      output[:branch] = element
+      initial_elements.delete(element)
+      next
     end
 
     # If no more args passed, we use current settings

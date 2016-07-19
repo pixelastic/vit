@@ -18,15 +18,23 @@ def create_directory
     Time.now.strftime('%Y-%m-%d_%H-%M-%S'),
     Time.now.to_f.to_s.tr('.', '')
   ].join('_')
-  @tmp_repo = File.join(Dir.tmpdir, 'vit', "repo_#{now}")
-  FileUtils.mkdir_p(@tmp_repo)
+  @repo_path = File.join(Dir.tmpdir, 'vit', "repo_#{now}")
+  FileUtils.mkdir_p(@repo_path)
 
   move_in_directory
 end
 
 # Move in current directory
 def move_in_directory
-  Dir.chdir(@tmp_repo)
+  Dir.chdir(@repo_path)
+end
+
+# Create a subdirectory
+def create_and_move_to_subdirectory
+  subdir = File.join(@repo_path, 'subdir')
+  FileUtils.mkdir_p(subdir)
+  Dir.chdir(subdir)
+  @repo_subdir_path = subdir
 end
 
 # Creates a new repo in the dir
@@ -49,9 +57,6 @@ end
 def delete_directory(example)
   move_out_of_directory
   # Delete temp dir if no error
-  if !@tmp_repo.nil? && !example.exception
-    FileUtils.remove_dir(@tmp_repo)
-  end
+  FileUtils.remove_dir(@repo_path) if !@repo_path.nil? && !example.exception
 end
-
 
