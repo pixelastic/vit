@@ -1,6 +1,19 @@
-#!/usr/bin/env zsh
-# Check if the specified branch exists.
-# Note that we do not use plumbing methods like `rev-parse` or `show-ref` as
-# they will also list branches that have been merged.
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
 
-git branch -l | grep "$1" &>/dev/null
+# Checks if the specified branch exists
+# Usage:
+#   $ git branch-exist {branchName}
+class GitBranchExists
+  include GitHelper
+  def initialize(*args)
+    @branch = args[0]
+  end
+
+  def run
+    exit 1 unless branch?(@branch)
+    exit 0
+  end
+end
+GitBranchExists.new(*ARGV).run
+

@@ -53,10 +53,52 @@ def move_out_of_directory
   Dir.chdir(@root_dir) unless @root_dir.nil?
 end
 
+# Create a remote in the repository
+def create_remote(name, url)
+  `git remote add #{name} #{url}`
+end
+
+# Create a tag in the repository
+def create_tag(name)
+  commands = [
+    "echo 'For tag #{name}' >> tag",
+    'git add tag',
+    "git commit -m 'Commit for tag #{name}'",
+    "git tag #{name}"
+  ].join(' && ')
+  `#{commands}`
+end
+
+# Create a branch in the repository
+def create_branch(name)
+  commands = [
+    "echo 'For branch #{name}' >> branch",
+    'git add branch',
+    "git commit -m 'Commit for branch #{name}'",
+    "git checkout -b #{name} -q"
+  ].join(' && ')
+  `#{commands}`
+end
+
+# Set the remote for the current branch
+def set_remote(branch, remote)
+  `git config branch.#{branch}.remote #{remote}`
+end
+
+# Adds a new commit
+def add_commit
+  commands = [
+    "echo 'New commit' >> commit",
+    'git add commit',
+    "git commit -m 'New commit'"
+  ].join(' && ')
+  `#{commands}`
+end
+
+
 # Deletes the previously created directory
 def delete_directory(example)
   move_out_of_directory
   # Delete temp dir if no error
   FileUtils.remove_dir(@repo_path) if !@repo_path.nil? && !example.exception
 end
-

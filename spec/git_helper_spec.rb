@@ -199,4 +199,198 @@ describe(GitHelper) do
       expect(actual).to eq nil
     end
   end
+
+  describe 'remote?' do
+    it 'returns true if the remote exists' do
+      # Given
+      create_repository
+      create_remote('foo', 'url')
+
+      # When
+      actual = test_instance.remote? 'foo'
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'returns false if the remote does not exist' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.remote? 'do_not_exist'
+
+      # Then
+      expect(actual).to eq false
+    end
+
+  end
+
+  describe 'tag?' do
+    it 'returns true if the tag exists' do
+      # Given
+      create_repository
+      create_tag 'foo'
+
+      # When
+      actual = test_instance.tag? 'foo'
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'returns false if the tag does not exist' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.tag? 'do_not_exist'
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'returns false if only partial match' do
+      # Given
+      create_repository
+      create_tag 'foobar'
+
+      # When
+      actual = test_instance.tag? 'foo'
+
+      # Then
+      expect(actual).to eq false
+    end
+  end
+
+  describe 'branch?' do
+    it 'returns true if the branch exists' do
+      # Given
+      create_repository
+      create_branch 'foo'
+
+      # When
+      actual = test_instance.branch? 'foo'
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'returns false if the branch does not exist' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.branch? 'do_not_exist'
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'returns false if only partial match' do
+      # Given
+      create_repository
+      create_branch 'foobar'
+
+      # When
+      actual = test_instance.branch? 'foo'
+
+      # Then
+      expect(actual).to eq false
+    end
+  end
+
+  describe 'current_branch' do
+    it 'returns the name of the current branch' do
+      # Given
+      create_repository
+      create_branch 'foo'
+
+      # When
+      actual = test_instance.current_branch
+
+      # Then
+      expect(actual).to eq 'foo'
+    end
+
+    it 'returns HEAD if no current branch' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.current_branch
+
+      # Then
+      expect(actual).to eq 'HEAD'
+    end
+  end
+
+  describe 'current_remote' do
+    it 'returns the name of the current remote associated with the branch' do
+      # Given
+      create_repository
+      create_branch 'develop'
+      create_remote('upstream', 'url')
+      set_remote('develop', 'upstream')
+
+      # When
+      actual = test_instance.current_remote
+
+      # Then
+      expect(actual).to eq 'upstream'
+    end
+
+    it 'returns origin if no remote specified' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.current_remote
+
+      # Then
+      expect(actual).to eq 'origin'
+    end
+  end
+
+  describe 'current_tags' do
+    it 'return the name of the tag on the current commit if any' do
+      # Given
+      create_repository
+      create_tag 'foo'
+
+      # When
+      actual = test_instance.current_tag
+
+      # Then
+      expect(actual).to eq 'foo'
+    end
+
+    it 'returns nil if no tag set' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.current_tag
+
+      # Then
+      expect(actual).to eq nil
+    end
+
+    it 'returns the name of the closest tag' do
+      # Given
+      create_repository
+      create_tag 'foo'
+      add_commit
+
+      # When
+      actual = test_instance.current_tag
+
+      # Then
+      expect(actual).to eq 'foo'
+    end
+  end
+
+  describe 'guess_elements' do
+
+  end
 end

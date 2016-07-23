@@ -5,15 +5,22 @@ require 'fileutils'
 # Usage :
 # $ git-directory-create
 # $ git-directory-create ./path/to/repo
+# $ git-directory-create ./path/to/repo url@to:repo.git
+# $ git-directory-create url@to:repo.git ./path/to/repo
 # Options:
 #  -n : Do not create a repo on github
 class GitDirectoryCreate
   def initialize(*args)
+    # Filepath and repo url
+    @path = File.expand_path(args[0] || '.')
+
+
+
+    @push_to_github = true
     if args.include?('-n')
-      @is_dry_run = args.include?('-n')
+      @push_to_github = false
       args.delete('-n')
     end
-    @path = File.expand_path(args[0] || '.')
     @name = File.basename(@path)
     @remote = args[1] || :github
   end

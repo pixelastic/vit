@@ -1,3 +1,18 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
 
-git config --get remote.${1}.url &>/dev/null
+# Checks if the specified remote exists
+# Usage:
+#   $ git remote-exists {remoteName}
+class GitRemoteExists
+  include GitHelper
+  def initialize(*args)
+    @remote = args[0]
+  end
+
+  def run
+    exit 1 unless remote?(@remote)
+    exit 0
+  end
+end
+GitRemoteExists.new(*ARGV).run

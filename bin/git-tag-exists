@@ -1,7 +1,18 @@
-#!/usr/bin/env zsh
-# Check if specified tag exists.
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
 
-if [[ "$(git tag -l "$1")" != '' ]]; then
-  exit 0
-fi
-exit 1
+# Checks if the specified tag exists
+# Usage:
+#   $ git tag-exist {tagName}
+class GitTagExists
+  include GitHelper
+  def initialize(*args)
+    @tag = args[0]
+  end
+
+  def run
+    exit 1 unless tag?(@tag)
+    exit 0
+  end
+end
+GitTagExists.new(*ARGV).run

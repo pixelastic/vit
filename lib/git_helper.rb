@@ -39,6 +39,89 @@ module GitHelper
     output
   end
 
+  # Checks if the specified remote exists
+  def remote?(name)
+    command = "git config --get remote.#{name}.url"
+    command_success?(command)
+  end
+
+  # Checks if the specified tag exists
+  def tag?(name)
+    command = "git tag -l #{name.shellescape}"
+    output = command_stdout(command)
+    output == name
+  end
+
+  # Checks if the specified branch exists
+  def branch?(name)
+    command = 'git branch -l'
+    list = command_stdout(command)
+    tokens = list.split(' ')
+    tokens.delete('*')
+    tokens.include?(name)
+  end
+
+  # Returns the current branch name
+  def current_branch
+    command = 'git rev-parse --abbrev-ref HEAD'
+    command_stdout(command)
+  end
+
+  def current_remote
+    command = "git config --get branch.#{current_branch}.remote"
+    remote = command_stdout(command)
+    return 'origin' if remote == ''
+    remote
+  end
+
+  def current_tag
+    command = 'git describe --tags --abbrev=0'
+    tag = command_stdout(command)
+    return nil if tag == ''
+    tag
+  end
+
+  def guess_elements(elements)
+    output = {}
+    initial_elements = elements.clone
+
+    # Guess element types from the list of passed elements, by importance.
+    # First the remotes, then the tags, and finally the branches.
+    elements.each do |element|
+      if remote?(element) && !output.key?(:remote)
+        output[:remote] = element
+        initial_elements.delete(element)
+        next
+      end
+
+      if tag?(element) && !output.key?(:tag)
+        output[:tag] = element
+        initial_elements.delete(element)
+        next
+      end
+
+      next unless branch?(element) && !output.key?(:branch)
+      output[:branch] = element
+      initial_elements.delete(element)
+      next
+    end
+
+    # If no more args passed, we use current settings
+    if initial_elements.size == 0
+      output[:branch] = current_branch unless output[:branch]
+      output[:remote] = current_remote unless output[:remote]
+      output[:tag] = current_tag unless output[:tag]
+    else
+      output[:unknown] = initial_elements
+    end
+
+    # If still no remote, we default to origin
+    output[:remote] = 'origin' if output[:remote].nil?
+
+    output
+  end
+
+
 
 
   @@colors = {
@@ -138,17 +221,6 @@ module GitHelper
     system("git-is-submodule #{path.shellescape}")
   end
 
-  def current_branch
-    `git branch-current`.strip
-  end
-
-  def current_remote
-    `git remote-current`.strip
-  end
-
-  def current_tag
-    `git tag-current`.strip
-  end
 
   def current_commit
     `git commit-current`.strip
@@ -172,21 +244,12 @@ module GitHelper
     `git-remote-url #{remote}`.strip
   end
 
-  def branch?(name)
-    system("git branch-exists #{name}")
-  end
 
   def branch_gone?(name)
     system("git branch-gone #{name}")
   end
 
-  def remote?(name)
-    system("git remote-exists #{name}")
-  end
 
-  def tag?(name)
-    system("git tag-exists #{name}")
-  end
 
   # Run npm install if package.json changed since old_commit
   def npm_install(old_commit)
@@ -227,43 +290,4 @@ module GitHelper
     padded_array
   end
 
-  def guess_elements(elements)
-    output = {}
-    initial_elements = elements.clone
-
-    # Guess element types from the list of passed elements, by importance.
-    # First the remotes, then the tags, and finally the branches.
-    elements.each do |element|
-      if remote?(element) && !output.key?(:remote)
-        output[:remote] = element
-        initial_elements.delete(element)
-        next
-      end
-
-      if tag?(element) && !output.key?(:tag)
-        output[:tag] = element
-        initial_elements.delete(element)
-        next
-      end
-
-      next unless branch?(element) && !output.key?(:branch)
-      output[:branch] = element
-      initial_elements.delete(element)
-      next
-    end
-
-    # If no more args passed, we use current settings
-    if initial_elements.size == 0
-      output[:branch] = current_branch unless output[:branch]
-      output[:remote] = current_remote unless output[:remote]
-      output[:tag] = current_tag unless output[:tag]
-    else
-      output[:unknown] = initial_elements
-    end
-
-    # If still no remote, we default to origin
-    output[:remote] = 'origin' if output[:remote].nil?
-
-    output
-  end
 end
