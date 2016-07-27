@@ -8,8 +8,6 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 end
 
-
-
 # Create a directory
 def create_directory
   @root_dir = File.expand_path('.')
@@ -54,7 +52,7 @@ def move_out_of_directory
 end
 
 # Create a remote in the repository
-def create_remote(name, url)
+def create_remote(name, url = 'url')
   `git remote add #{name} #{url}`
 end
 
@@ -83,6 +81,13 @@ end
 # Set the remote for the current branch
 def set_remote(branch, remote)
   `git config branch.#{branch}.remote #{remote}`
+end
+
+# Create a branch and set its remote
+def create_branch_with_remote(branch, remote)
+  create_branch(branch)
+  create_remote(remote)
+  set_remote(branch, remote)
 end
 
 # Adds a new commit

@@ -81,7 +81,9 @@ module GitHelper
     tag
   end
 
-  def guess_elements(elements)
+  def guess_elements(*elements)
+    # Allow for one array or splats
+    elements = elements[0] if elements.length == 1
     output = {}
     initial_elements = elements.clone
 

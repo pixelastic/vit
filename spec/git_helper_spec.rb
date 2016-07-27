@@ -204,7 +204,7 @@ describe(GitHelper) do
     it 'returns true if the remote exists' do
       # Given
       create_repository
-      create_remote('foo', 'url')
+      create_remote('foo')
 
       # When
       actual = test_instance.remote? 'foo'
@@ -329,9 +329,7 @@ describe(GitHelper) do
     it 'returns the name of the current remote associated with the branch' do
       # Given
       create_repository
-      create_branch 'develop'
-      create_remote('upstream', 'url')
-      set_remote('develop', 'upstream')
+      create_branch_with_remote('develop', 'upstream')
 
       # When
       actual = test_instance.current_remote
@@ -391,6 +389,125 @@ describe(GitHelper) do
   end
 
   describe 'guess_elements' do
+    it 'should guess the branch' do
+      # Given
+      create_repository
+      create_branch 'develop'
+      input = ['develop']
 
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:branch]).to eq 'develop'
+    end
+
+    it 'should guess the tag' do
+      # Given
+      create_repository
+      create_tag 'v1'
+      input = ['v1']
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:tag]).to eq 'v1'
+    end
+
+    it 'should guess the remote' do
+      # Given
+      create_repository
+      create_remote('foo')
+      input = ['foo']
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:remote]).to eq 'foo'
+    end
+
+    it 'should guess them all' do
+      # Given
+      create_repository
+      create_branch_with_remote('develop', 'upstream')
+      create_tag 'v1'
+      input = %w(develop v1 upstream)
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:branch]).to eq 'develop'
+      expect(actual[:tag]).to eq 'v1'
+      expect(actual[:remote]).to eq 'upstream'
+    end
+
+    it 'should accept either an array or splats' do
+      # Given
+      create_repository
+      create_branch_with_remote('develop', 'upstream')
+      create_tag 'v1'
+      input = %w(develop v1 upstream)
+
+      # When
+      actual = test_instance.guess_elements(*input)
+
+      # Then
+      expect(actual[:branch]).to eq 'develop'
+      expect(actual[:tag]).to eq 'v1'
+      expect(actual[:remote]).to eq 'upstream'
+    end
+
+    it 'should default to current branch' do
+      # Given
+      create_repository
+      create_branch('develop')
+      input = []
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:branch]).to eq 'develop'
+    end
+
+    it 'should default to current tag' do
+      # Given
+      create_repository
+      create_tag('v1')
+      input = []
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:tag]).to eq 'v1'
+    end
+
+    it 'should default to current remote' do
+      # Given
+      create_repository
+      input = []
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:remote]).to eq 'origin'
+    end
+
+    it 'should put all unknown in a special attribute' do
+      # Given
+      create_repository
+      input = %w(foo bar)
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:unknown]).to eq %w(foo bar)
+    end
   end
 end
