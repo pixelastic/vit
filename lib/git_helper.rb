@@ -81,50 +81,46 @@ module GitHelper
     tag
   end
 
-  def guess_elements(*elements)
+  def guess_elements(*inputs)
     # Allow for one array or splats
-    elements = elements[0] if elements.length == 1
-    output = {}
-    initial_elements = elements.clone
+    inputs = inputs[0] if inputs.length == 1
 
-    # Guess element types from the list of passed elements, by importance.
-    # First the remotes, then the tags, and finally the branches.
-    elements.each do |element|
-      if remote?(element) && !output.key?(:remote)
-        output[:remote] = element
-        initial_elements.delete(element)
-        next
+    types = %w(remote tag branch)
+    guessed_elements = []
+    elements = {
+      unknown: []
+    }
+
+    # Guessing each type
+    inputs.each do |element|
+      found_type = nil
+
+      types.each do |type|
+        # Already found the remote/tag/branch
+        next if elements.key?(type.to_sym)
+
+        # Is of this type, we remember it and break out of the loop
+        if send("#{type}?", element)
+          found_type = type
+          break
+        end
       end
 
-      if tag?(element) && !output.key?(:tag)
-        output[:tag] = element
-        initial_elements.delete(element)
-        next
+      if found_type.nil?
+        elements[:unknown] << element
+      else
+        elements[found_type.to_sym] = element
       end
-
-      next unless branch?(element) && !output.key?(:branch)
-      output[:branch] = element
-      initial_elements.delete(element)
-      next
     end
 
-    # If no more args passed, we use current settings
-    if initial_elements.size == 0
-      output[:branch] = current_branch unless output[:branch]
-      output[:remote] = current_remote unless output[:remote]
-      output[:tag] = current_tag unless output[:tag]
-    else
-      output[:unknown] = initial_elements
+    # Setting default values
+    types.each do |type|
+      next if elements.key?(type.to_sym)
+      elements[type.to_sym] = send("current_#{type}")
     end
 
-    # If still no remote, we default to origin
-    output[:remote] = 'origin' if output[:remote].nil?
-
-    output
+    elements
   end
-
-
-
 
   @@colors = {
     branch: 202,
