@@ -33,16 +33,6 @@ describe(CommandHelper) do
       # Then
       expect(actual).to eq false
     end
-
-    it 'should not output anything if errors' do
-      # Given
-
-      # When
-      actual = instance.command_success?('aaa')
-
-      # Then
-      # expect(actual).to eq false
-    end
   end
 
   describe 'command_stdout' do

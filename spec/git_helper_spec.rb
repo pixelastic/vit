@@ -675,20 +675,19 @@ describe(GitHelper) do
       add_commit
 
       # When
-
-      test_instance.create_branch('master')
+      test_instance.create_branch('develop')
 
       # Then
-      expect(test_instance.branch?('master')).to eq true
+      expect(test_instance.branch?('develop')).to eq true
     end
 
-    fit 'should return false when creating a branch that already exists' do
+    it 'should return false when creating a branch that already exists' do
       # Given
       create_repository
-      create_branch('master')
+      create_branch('develop')
 
       # When
-      actual = test_instance.create_branch('master')
+      actual = test_instance.create_branch('develop')
 
       # Then
       expect(actual).to eq false

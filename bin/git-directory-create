@@ -32,7 +32,23 @@ class GitDirectoryCreate
       puts "✘ Aborting, #{@path} is already a git repo"
       exit 1
     end
+
     create_repo(@path)
+    # Add default .gitignore
+    # Only if not already here
+    # Add default README file, with header being the name of the repo
+    # Initial commit
+    
+    # Stop if -n
+    
+    # Create GH repo if GH
+    # pixelastic or algolia
+
+    # Define remote name
+    # Add remote
+
+    # Push
+    # Suggest BitBucket URL if failed
 
   end
   # def initialize(*args)
@@ -46,24 +62,6 @@ class GitDirectoryCreate
   # end
 
 
-  # def init_repo
-  #   # Stop if already a git repo
-  #   if File.exist?(File.join(@path, '.git'))
-  #     puts '✘ Directory is already a git repo'
-  #     exit 1
-  #   end
-
-  #   # Init the repo
-  #   `git init #{@path}`
-  #   puts '✔ Local repository created'
-  #   # Set a master branch
-  #   if system('git checkout --quiet -b master')
-  #     puts '✔ Branch master set as default'
-  #   else
-  #     puts '✘ Unable to create branch master'
-  #     exit 1
-  #   end
-  # end
 
   # # Add default files
   # def add_default_files
