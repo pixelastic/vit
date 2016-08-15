@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'fileutils'
+require_relative '../lib/git_helper'
 
 # Creates a new repository, and plug it to github by default
 # Usage :
@@ -8,103 +8,116 @@ require 'fileutils'
 # $ git-directory-create ./path/to/repo url@to:repo.git
 # $ git-directory-create url@to:repo.git ./path/to/repo
 # Options:
-#  -n : Do not create a repo on github
+#   By default it will create a repo on GitHub and set it as the remote
+#  -n : Do not add any remote
+#  -b : Set the remote to BitBucket
+#  -a : Create the remote under the Algolia namespace
 class GitDirectoryCreate
+  include GitHelper
   def initialize(*args)
-    # Filepath and repo url
-    @path = File.expand_path(args[0] || '.')
+    elements = guess_elements(args)
+    ap elements
 
+    # Use specified path (if guessed) or unknown element. Fallback to current
+    # directory
+    @path = elements[:path]
+    @path = elements[:unknown][0] if @path.nil?
+    @path = File.expand_path('.') if @path.nil?
 
-
-    @push_to_github = true
-    if args.include?('-n')
-      @push_to_github = false
-      args.delete('-n')
-    end
-    @name = File.basename(@path)
-    @remote = args[1] || :github
-  end
-
-  def cd_to_repo
-    # If the repo does not exists, we create the directory
-    if @name != File.basename(File.expand_path('.'))
-      FileUtils.mkdir_p(File.join('.', @name))
-    end
-    Dir.chdir(@path)
-  end
-
-  def init_repo
-    # Stop if already a git repo
-    if File.exist?(File.join(@path, '.git'))
-      puts '✘ Directory is already a git repo'
-      exit 1
-    end
-
-    # Init the repo
-    `git init #{@path}`
-    puts '✔ Local repository created'
-    # Set a master branch
-    if system('git checkout --quiet -b master')
-      puts '✔ Branch master set as default'
-    else
-      puts '✘ Unable to create branch master'
-      exit 1
-    end
-  end
-
-  # Add default files
-  def add_default_files
-    # Add gitignore
-    default_gitignore = File.expand_path('~/.oroshi/config/git/gitignore')
-    if File.exist?(default_gitignore)
-      FileUtils.cp(default_gitignore, './.gitignore')
-    end
-
-    # Add readme
-    system("echo '# #{@name}\n' > README.md")
-
-    system('git add .')
-    system('git commit --quiet -m "Add .gitignore and README"')
-    puts '✔ Default files added'
-  end
-
-  def create_remote
-    return if @is_dry_run
-    return unless @remote == :github
-    # Create github repo
-    `gh repo -N #{@name} &>/dev/null`
-    puts '✔ Repository created'
-
-    # Add remote
-    if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
-      # set-url does not seem to set the fetch value, so we manually put it
-      fetch_value = '+refs/heads/*:refs/remotes/origin/*'
-      `git config --add remote.origin.fetch '#{fetch_value}'`
-
-      puts '✔ Remote origin set to GitHub'
-    else
-      puts '✘ Unable to set remote to GitHub'
-      exit
-    end
-  end
-
-  def push
-    return if @is_dry_run
-    if system('git push --set-upstream origin master &>/dev/null')
-      puts '✔ Pushed'
-    else
-      puts '✘ Unable to push'
-      exit 1
-    end
+    # Will create a remote on github by default
   end
 
   def run
-    cd_to_repo
-    init_repo
-    add_default_files
-    create_remote
-    push
+    if repository?(@path)
+      puts "✘ Aborting, #{@path} is already a git repo"
+      exit 1
+    end
+    create_repo(@path)
 
   end
+  # def initialize(*args)
+  #   @push_to_github = true
+  #   if args.include?('-n')
+  #     @push_to_github = false
+  #     args.delete('-n')
+  #   end
+  #   @name = File.basename(@path)
+  #   @remote = args[1] || :github
+  # end
+
+
+  # def init_repo
+  #   # Stop if already a git repo
+  #   if File.exist?(File.join(@path, '.git'))
+  #     puts '✘ Directory is already a git repo'
+  #     exit 1
+  #   end
+
+  #   # Init the repo
+  #   `git init #{@path}`
+  #   puts '✔ Local repository created'
+  #   # Set a master branch
+  #   if system('git checkout --quiet -b master')
+  #     puts '✔ Branch master set as default'
+  #   else
+  #     puts '✘ Unable to create branch master'
+  #     exit 1
+  #   end
+  # end
+
+  # # Add default files
+  # def add_default_files
+  #   # Add gitignore
+  #   default_gitignore = File.expand_path('~/.oroshi/config/git/gitignore')
+  #   if File.exist?(default_gitignore)
+  #     FileUtils.cp(default_gitignore, './.gitignore')
+  #   end
+
+  #   # Add readme
+  #   system("echo '# #{@name}\n' > README.md")
+
+  #   system('git add .')
+  #   system('git commit --quiet -m "Add .gitignore and README"')
+  #   puts '✔ Default files added'
+  # end
+
+  # def create_remote
+  #   return if @is_dry_run
+  #   return unless @remote == :github
+  #   # Create github repo
+  #   `gh repo -N #{@name} &>/dev/null`
+  #   puts '✔ Repository created'
+
+  #   # Add remote
+  #   if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
+  #     # set-url does not seem to set the fetch value, so we manually put it
+  #     fetch_value = '+refs/heads/*:refs/remotes/origin/*'
+  #     `git config --add remote.origin.fetch '#{fetch_value}'`
+
+  #     puts '✔ Remote origin set to GitHub'
+  #   else
+  #     puts '✘ Unable to set remote to GitHub'
+  #     exit
+  #   end
+  # end
+
+  # def push
+  #   return if @is_dry_run
+  #   if system('git push --set-upstream origin master &>/dev/null')
+  #     puts '✔ Pushed'
+  #   else
+  #     puts '✘ Unable to push'
+  #     exit 1
+  #   end
+  # end
+
+  # def run
+  #   cd_to_repo
+  #   init_repo
+  #   add_default_files
+  #   create_remote
+  #   push
+
+  # end
 end
 GitDirectoryCreate.new(*ARGV).run

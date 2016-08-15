@@ -75,6 +75,20 @@ describe(GitHelper) do
       expect(actual).to eq false
     end
 
+    it 'returns true when the repo name contains a .git' do
+      # Given
+      create_repository
+      old_path = @repo_path
+      @repo_path = "#{@repo_path}.git"
+      FileUtils.mv(old_path, @repo_path)
+
+      # When
+      actual = test_instance.repository?(@repo_path)
+
+      # Then
+      expect(actual).to eq true
+    end
+
     it 'returns false when in the special .git directory' do
       # Given
       create_repository
@@ -300,6 +314,63 @@ describe(GitHelper) do
     end
   end
 
+  describe 'path?' do
+    it 'should return true if the filepath exists' do
+      # Given
+      create_directory
+
+      # When
+      actual = test_instance.path? @repo_path
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'should return true if looks like a filepath' do
+      # Given
+
+      # When
+      actual = test_instance.path?('./somewhere')
+
+      # Then
+      expect(actual).to eq true
+    end
+  end
+
+  describe 'url?' do
+    it 'should return true for github-like urls' do
+      # Given
+
+      # When
+      actual = test_instance.url?('git@github.com:pixelastic/vit.git')
+
+      # Then
+      expect(actual).to eq true
+    end
+  end
+
+  describe 'argument?' do
+    it 'should catch single dash arguments' do
+      # Given
+
+      # When
+      actual = test_instance.argument?('-n')
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'should catch double dash arguments' do
+      # Given
+
+      # When
+      actual = test_instance.argument?('--bitbucket')
+
+      # Then
+      expect(actual).to eq true
+    end
+  end
+
   describe 'current_branch' do
     it 'returns the name of the current branch' do
       # Given
@@ -428,7 +499,41 @@ describe(GitHelper) do
       expect(actual[:remote]).to eq 'foo'
     end
 
-    it 'should guess them all' do
+    it 'should guess the url' do
+      # Given
+      input = ['foo@bar:baz.git']
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:url]).to eq 'foo@bar:baz.git'
+    end
+
+    it 'should guess an obvious path' do
+      # Given
+      input = ['./path']
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:path]).to eq './path'
+    end
+
+    it 'should guess arguments' do
+      # Given
+      input = ['-n', '--bitbucket']
+
+      # When
+      actual = test_instance.guess_elements(input)
+
+      # Then
+      expect(actual[:arguments]).to include('-n')
+      expect(actual[:arguments]).to include('--bitbucket')
+    end
+
+    it 'should guess all the branch/tag/remote' do
       # Given
       create_repository
       create_branch_with_remote('develop', 'upstream')
@@ -509,5 +614,85 @@ describe(GitHelper) do
       # Then
       expect(actual[:unknown]).to eq %w(foo bar)
     end
+
+    it 'should guess path and url' do
+      # Given
+      input1 = ['./path', 'foo@bar:baz.git']
+      input2 = ['foo@bar:baz.git', './path']
+
+      # When
+      actual1 = test_instance.guess_elements(input1)
+      actual2 = test_instance.guess_elements(input2)
+
+      # Then
+      expect(actual1).to eq actual2
+    end
   end
+
+  describe 'create_repo' do
+    it 'creates a git repository in the current directory' do
+      # Given
+      create_directory
+
+      # When
+      test_instance.create_repo
+
+      # Then
+      expect(test_instance.repository?).to eq true
+    end
+
+    it 'creates a git repository in the specified directory' do
+      # Given
+      create_directory
+      move_out_of_directory
+
+      # When
+      test_instance.create_repo(@repo_path)
+
+      # Then
+      expect(test_instance.repository?(@repo_path)).to eq true
+    end
+
+    it 'creates a git repository even if the specified directory does not exist' do
+      # Given
+      create_directory
+      move_out_of_directory
+      subdir = File.join(@repo_path, 'subdir')
+
+      # When
+      test_instance.create_repo(subdir)
+
+      # Then
+      expect(test_instance.repository?(subdir)).to eq true
+    end
+  end
+
+  describe 'create_branch' do
+    it 'should create a new branch' do
+      # Given
+      create_repository
+      # Note: A branch can only be seen once at least one commit exists
+      add_commit
+
+      # When
+
+      test_instance.create_branch('master')
+
+      # Then
+      expect(test_instance.branch?('master')).to eq true
+    end
+
+    fit 'should return false when creating a branch that already exists' do
+      # Given
+      create_repository
+      create_branch('master')
+
+      # When
+      actual = test_instance.create_branch('master')
+
+      # Then
+      expect(actual).to eq false
+    end
+  end
+
 end

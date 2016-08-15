@@ -1,7 +1,8 @@
-require 'shellwords'
 require 'English'
-require 'open3'
 require 'awesome_print'
+require 'fileutils'
+require 'open3'
+require 'shellwords'
 require_relative './command_helper'
 
 # Allow access to current git repository state
@@ -17,7 +18,8 @@ module GitHelper
     return false unless File.exist?(directory)
 
     # Special .git directory can't be considered a repo
-    return false if directory =~ /\.git/
+    split = directory.split('/')
+    return false if split.include?('.git')
 
     # We temporarily change dir if one is specified
     previous_dir = File.expand_path('.')
@@ -61,6 +63,26 @@ module GitHelper
     tokens.include?(name)
   end
 
+  # Checks if the specified input looks like a filepath
+  # Note: This is a best effort guess as anything could be a filepath
+  def path?(input)
+    return true if File.exist?(input)
+    return true unless (%r{^\./} =~ input).nil?
+    false
+  end
+
+  # Checks if the specified input looks like a repo url
+  def url?(input)
+    # Example: git@github.com:pixelastic/vit.git
+    regexp = /^(.*)@(.*):(.*)\.git$/
+    !(regexp =~ input).nil?
+  end
+
+  # Checks if the specified input looks like a command line argument
+  def argument?(input)
+    !(input =~ /^--?/).nil?
+  end
+
   # Returns the current branch name
   def current_branch
     command = 'git rev-parse --abbrev-ref HEAD'
@@ -85,10 +107,10 @@ module GitHelper
     # Allow for one array or splats
     inputs = inputs[0] if inputs.length == 1
 
-    types = %w(remote tag branch)
-    guessed_elements = []
+    types = %w(remote tag branch url path)
     elements = {
-      unknown: []
+      unknown: [],
+      arguments: []
     }
 
     # Guessing each type
@@ -115,11 +137,49 @@ module GitHelper
 
     # Setting default values
     types.each do |type|
-      next if elements.key?(type.to_sym)
-      elements[type.to_sym] = send("current_#{type}")
+      type_sym = type.to_sym
+      current_type_method = "current_#{type}"
+
+      # Already set
+      next if elements.key?(type_sym)
+      # Setting default if such a default is even possible
+      if respond_to?(current_type_method)
+        elements[type_sym] = send(current_type_method)
+      end
     end
 
+    # Finding arguments in "unknown" elements
+    final_unknown = []
+    elements[:unknown].each do |unknown|
+      if argument?(unknown)
+        elements[:arguments] << unknown
+      else
+        final_unknown << unknown
+      end
+    end
+    elements[:unknown] = final_unknown
+
     elements
+  end
+
+  # Create a git repo on the specified filepath (default to current directory)
+  def create_repo(directory = nil)
+    current_dir = File.expand_path('.')
+    directory = current_dir if directory.nil?
+    FileUtils.mkdir_p(directory) unless File.exist?(directory)
+    Dir.chdir(directory)
+
+    command = 'git init'
+    success = command_success?(command)
+
+    Dir.chdir(current_dir)
+    success
+  end
+
+  # Creates a branch of the specified name
+  def create_branch(branch)
+    command = "git checkout --quiet -b #{branch}"
+    command_success?(command)
   end
 
   @@colors = {
