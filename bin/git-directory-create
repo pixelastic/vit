@@ -47,10 +47,8 @@ class GitDirectoryCreate
       end
     end
 
-  #   system('git add .')
-  #   system('git commit --quiet -m "Add .gitignore and README"')
-  #   puts '✔ Default files added'
-
+    stage_all
+    create_commit('Add .gitignore and README.md')
   end
 
   def run

@@ -1,3 +1,14 @@
-#!/usr/bin/env zsh
-# Display the current commit short hash
-git log --pretty=format:'%h' -n 1 2>/dev/null
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
+
+# Returns the name of the current commit
+# Usage:
+#   $ git commit-current
+class GitCommitCurrent
+  include GitHelper
+
+  def run
+    puts current_commit
+  end
+end
+GitCommitCurrent.new.run
