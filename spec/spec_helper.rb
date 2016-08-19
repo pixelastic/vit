@@ -100,6 +100,12 @@ def add_commit
   `#{commands}`
 end
 
+# Create a file on disk
+def create_file(path, content = 'Dummy content')
+  File.open(path, 'w') do |file|
+    file.write(content)
+  end
+end
 
 # Deletes the previously created directory
 def delete_directory(example)

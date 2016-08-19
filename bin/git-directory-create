@@ -22,9 +22,35 @@ class GitDirectoryCreate
     # directory
     @path = elements[:path]
     @path = elements[:unknown][0] if @path.nil?
-    @path = File.expand_path('.') if @path.nil?
+    @path = '.' if @path.nil?
+    @path = File.expand_path(@path)
+
+    # Name of the repo is dirname by default
+    @name = File.dirname(@path)
 
     # Will create a remote on github by default
+  end
+
+  def add_default_files
+    # Add .gitignore
+    gitignore_path = File.join(@path, '.gitignore')
+    unless File.exist?(gitignore_path)
+      default_gitignore = File.expand_path('~/.oroshi/config/git/gitignore')
+      FileUtils.cp(default_gitignore, gitignore_path)
+    end
+
+    # Add readme
+    readme_path = File.join(@path, 'README.md')
+    unless File.exist?(readme_path)
+      File.open(readme_path, 'w') do |file| 
+        file.write("# #{@name}")
+      end
+    end
+
+  #   system('git add .')
+  #   system('git commit --quiet -m "Add .gitignore and README"')
+  #   puts '✔ Default files added'
+
   end
 
   def run
@@ -34,6 +60,11 @@ class GitDirectoryCreate
     end
 
     create_repo(@path)
+    Dir.chdir(@path)
+    add_default_files
+
+
+    end
     # Add default .gitignore
     # Only if not already here
     # Add default README file, with header being the name of the repo
@@ -66,17 +97,7 @@ class GitDirectoryCreate
   # # Add default files
   # def add_default_files
   #   # Add gitignore
-  #   default_gitignore = File.expand_path('~/.oroshi/config/git/gitignore')
-  #   if File.exist?(default_gitignore)
-  #     FileUtils.cp(default_gitignore, './.gitignore')
-  #   end
 
-  #   # Add readme
-  #   system("echo '# #{@name}\n' > README.md")
-
-  #   system('git add .')
-  #   system('git commit --quiet -m "Add .gitignore and README"')
-  #   puts '✔ Default files added'
   # end
 
   # def create_remote
