@@ -57,4 +57,124 @@ describe(GitRemoteHelper) do
       expect(actual).to eq 'origin'
     end
   end
+
+  describe 'create_remote' do
+    it 'should create a remote with the specified name' do
+      # Given
+      create_repository
+
+      # When
+      test_instance.create_remote('foo', 'url')
+      actual = test_instance.remote?('foo')
+
+      # Then
+      expect(actual).to eq true
+    end
+
+    it 'should return false if trying to overide an existing remote' do
+      # Given
+      create_repository
+      test_instance.create_remote('foo', 'url')
+
+      # When
+      actual = test_instance.create_remote('foo', 'url again')
+
+      # Then
+      expect(actual).to eq false
+    end
+  end
+
+  describe 'set_current_remote' do
+    it 'should return false if the specified remote does not exist' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.set_current_remote('foo')
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'should return false if not specified branch does not exist' do
+      # Given
+      create_repository
+      test_instance.create_remote('upstream', 'url')
+
+      # When
+      actual = test_instance.set_current_remote('upstream', 'develop')
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'should return false if not currently in a branch' do
+      # Given
+      create_repository
+      test_instance.create_remote('upstream', 'url')
+
+      # When
+      actual = test_instance.set_current_remote('upstream')
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'should set the current remote to the specified remote' do
+      # Given
+      create_repository
+      create_branch('develop')
+      test_instance.create_remote('upstream', 'url')
+
+      # When
+      test_instance.set_current_remote('upstream')
+      actual = test_instance.current_remote
+
+      # Then
+      expect(actual).to eq 'upstream'
+    end
+
+    it 'should return false if the specified remote is already the current one' do
+      # Given
+      create_repository
+      create_branch('develop')
+      test_instance.create_remote('upstream', 'url')
+
+      # When
+      test_instance.set_current_remote('upstream')
+      actual = test_instance.set_current_remote('upstream')
+
+      # Then
+      expect(actual).to eq false
+    end
+
+  end
+
+  describe 'remote_url' do
+    it 'should return the url of the specified remote' do
+      # Given
+      create_repository
+      test_instance.create_remote('foo', 'url')
+
+      # When
+      actual = test_instance.remote_url('foo')
+
+      # Then
+      expect(actual).to eq 'url'
+    end
+
+    it 'should return false if the remote does not exist ' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.remote_url('foo')
+
+      # Then
+      expect(actual).to eq false
+    end
+
+    it 'should return the url of the current remote if none specified' do
+    end
+  end
 end

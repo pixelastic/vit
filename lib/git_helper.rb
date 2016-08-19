@@ -134,11 +134,6 @@ module GitHelper
     `git-remote-owner #{remote}`.strip
   end
 
-  def remote_url(remote: nil)
-    `git-remote-url #{remote}`.strip
-  end
-
-
   def branch_gone?(name)
     system("git branch-gone #{name}")
   end

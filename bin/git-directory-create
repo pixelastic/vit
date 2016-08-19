@@ -16,7 +16,6 @@ class GitDirectoryCreate
   include GitHelper
   def initialize(*args)
     elements = guess_elements(args)
-    ap elements
 
     # Use specified path (if guessed) or unknown element. Fallback to current
     # directory
@@ -28,7 +27,11 @@ class GitDirectoryCreate
     # Name of the repo is dirname by default
     @name = File.dirname(@path)
 
-    # Will create a remote on github by default
+    # Set remote type
+    @remote_type = :github
+    @remote_type = :algolia if elements[:arguments].include?('-a')
+    @remote_type = :bitbucket if elements[:arguments].include?('-b')
+    @remote_type = :none if elements[:arguments].include?('-n')
   end
 
   def add_default_files
@@ -42,13 +45,42 @@ class GitDirectoryCreate
     # Add readme
     readme_path = File.join(@path, 'README.md')
     unless File.exist?(readme_path)
-      File.open(readme_path, 'w') do |file| 
+      File.open(readme_path, 'w') do |file|
         file.write("# #{@name}")
       end
     end
 
     stage_all
     create_commit('Add .gitignore and README.md')
+  end
+
+  def set_remote
+    return if @remote_type == :none
+
+    url = "git@github.com:pixelastic/#{@name}.git" if @remote_type == :github
+    url = "git@github.com:algolia/#{@name}.git" if @remote_type == :algolia
+    url = "git@bitbucket.org:pixelastic/#{@name}.git" if @remote_type == :bitbucket
+
+    # set_remote_url(origin, url)
+    #
+    # if github
+    # create gh repo
+  #   `gh repo -N #{@name} &>/dev/null`
+
+    create_remote(
+
+  #   # Add remote
+  #   if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
+  #     # set-url does not seem to set the fetch value, so we manually put it
+  #     fetch_value = '+refs/heads/*:refs/remotes/origin/*'
+  #     `git config --add remote.origin.fetch '#{fetch_value}'`
+
+  #     puts '✔ Remote origin set to GitHub'
+  #   else
+  #     puts '✘ Unable to set remote to GitHub'
+  #     exit
+  #   end
+
   end
 
   def run
@@ -61,12 +93,8 @@ class GitDirectoryCreate
     Dir.chdir(@path)
     add_default_files
 
-
-    end
-    # Add default .gitignore
-    # Only if not already here
-    # Add default README file, with header being the name of the repo
-    # Initial commit
+    set_remote if @remote_type != :none
+  end
     
     # Stop if -n
     
@@ -79,24 +107,6 @@ class GitDirectoryCreate
     # Push
     # Suggest BitBucket URL if failed
 
-  end
-  # def initialize(*args)
-  #   @push_to_github = true
-  #   if args.include?('-n')
-  #     @push_to_github = false
-  #     args.delete('-n')
-  #   end
-  #   @name = File.basename(@path)
-  #   @remote = args[1] || :github
-  # end
-
-
-
-  # # Add default files
-  # def add_default_files
-  #   # Add gitignore
-
-  # end
 
   # def create_remote
   #   return if @is_dry_run
