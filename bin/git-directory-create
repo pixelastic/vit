@@ -61,6 +61,8 @@ class GitDirectoryCreate
     url = "git@github.com:algolia/#{@name}.git" if @remote_type == :algolia
     url = "git@bitbucket.org:pixelastic/#{@name}.git" if @remote_type == :bitbucket
 
+    set_remote_url('origin', url)
+
     # set_remote_url(origin, url)
     #
     # if github

@@ -147,7 +147,6 @@ describe(GitRemoteHelper) do
       # Then
       expect(actual).to eq false
     end
-
   end
 
   describe 'remote_url' do
@@ -175,6 +174,33 @@ describe(GitRemoteHelper) do
     end
 
     it 'should return the url of the current remote if none specified' do
+    end
+  end
+
+  describe 'set_remote_url' do
+    it 'should change the url of the specified remote' do
+      # Given
+      create_repository
+      test_instance.create_remote('upstream', 'foo')
+
+      # When
+      test_instance.set_remote_url('upstream', 'bar')
+      actual = test_instance.remote_url('upstream')
+
+      # Then
+      expect(actual).to eq 'bar'
+    end
+
+    it 'should return false if no such remote' do
+      # Given
+      create_repository
+      test_instance.create_remote('upstream', 'foo')
+
+      # When
+      actual = test_instance.set_remote_url('foobar', 'bar')
+
+      # Then
+      expect(actual).to eq false
     end
   end
 end

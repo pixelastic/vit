@@ -44,5 +44,12 @@ module GitRemoteHelper
     command_stdout(command)
   end
 
+  # Set the remote url
+  def set_remote_url(remote, url)
+    return false unless remote?(remote)
+    command = "git remote set-url #{remote} '#{url}'"
+    command_success?(command)
+  end
+
 
 end
