@@ -107,6 +107,11 @@ def create_file(path, content = 'Dummy content')
   end
 end
 
+# Set a config
+def set_config(name, value)
+  `git config #{name} #{value}`
+end
+
 # Deletes the previously created directory
 def delete_directory(example)
   move_out_of_directory

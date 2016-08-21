@@ -7,6 +7,7 @@ require_relative './command_helper'
 require_relative './git_argument_helper'
 require_relative './git_branch_helper'
 require_relative './git_commit_helper'
+require_relative './git_config_helper'
 require_relative './git_file_helper'
 require_relative './git_remote_helper'
 require_relative './git_repository_helper'
@@ -17,6 +18,7 @@ module GitHelper
   include CommandHelper
   include GitArgumentHelper
   include GitCommitHelper
+  include GitConfigHelper
   include GitBranchHelper
   include GitFileHelper
   include GitRemoteHelper

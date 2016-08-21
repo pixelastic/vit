@@ -6,15 +6,14 @@ module GitRemoteHelper
 
   # Checks if the specified remote exists
   def remote?(name)
-    command = "git config --get remote.#{name}.url"
-    command_success?(command)
+    return true if name == 'origin'
+    !get_config("remote.#{name}.url").nil?
   end
 
   # Return the name of the current remote
   def current_remote
-    command = "git config --get branch.#{current_branch}.remote"
-    remote = command_stdout(command)
-    return 'origin' if remote == ''
+    remote = get_config("branch.#{current_branch}.remote")
+    return 'origin' if remote.nil?
     remote
   end
 
@@ -26,8 +25,7 @@ module GitRemoteHelper
     return false unless branch?(branch)
     return false if remote == current_remote
 
-    command = "git config branch.#{branch}.remote #{remote}"
-    command_success?(command)
+    set_config("branch.#{branch}.remote", remote)
   end
 
   # Create the specified remote with specified url
@@ -40,15 +38,21 @@ module GitRemoteHelper
   # Returns the url of a given remote
   def remote_url(name)
     return false unless remote?(name)
-    command = "git config --get remote.#{name}.url"
-    command_stdout(command)
+    get_config("remote.#{name}.url")
   end
 
   # Set the remote url
   def set_remote_url(remote, url)
     return false unless remote?(remote)
     command = "git remote set-url #{remote} '#{url}'"
-    command_success?(command)
+    return false unless command_success?(command)
+
+    # When setting url for origin, we manually also need to set the fetch
+    if remote == 'origin' && get_config('remote.origin.fetch').nil?
+      return set_config('remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*')
+    end
+
+    true
   end
 
 

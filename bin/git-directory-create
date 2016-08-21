@@ -25,7 +25,7 @@ class GitDirectoryCreate
     @path = File.expand_path(@path)
 
     # Name of the repo is dirname by default
-    @name = File.dirname(@path)
+    @name = File.basename(@path)
 
     # Set remote type
     @remote_type = :github
@@ -34,6 +34,7 @@ class GitDirectoryCreate
     @remote_type = :none if elements[:arguments].include?('-n')
   end
 
+  # Adds readme and gitignore
   def add_default_files
     # Add .gitignore
     gitignore_path = File.join(@path, '.gitignore')
@@ -46,43 +47,61 @@ class GitDirectoryCreate
     readme_path = File.join(@path, 'README.md')
     unless File.exist?(readme_path)
       File.open(readme_path, 'w') do |file|
-        file.write("# #{@name}")
+        file.write("# #{@name}\n\n")
       end
     end
 
     stage_all
     create_commit('Add .gitignore and README.md')
+    puts '✔ Adding initial commit'
   end
 
+  # Define the origin remote
   def set_remote
     return if @remote_type == :none
 
     url = "git@github.com:pixelastic/#{@name}.git" if @remote_type == :github
     url = "git@github.com:algolia/#{@name}.git" if @remote_type == :algolia
-    url = "git@bitbucket.org:pixelastic/#{@name}.git" if @remote_type == :bitbucket
+    if @remote_type == :bitbucket
+      url = "git@bitbucket.org:pixelastic/#{@name}.git"
+    end
 
     set_remote_url('origin', url)
+    puts '✔ Configuring remote'
+  end
 
-    # set_remote_url(origin, url)
-    #
-    # if github
-    # create gh repo
-  #   `gh repo -N #{@name} &>/dev/null`
+  # Push to the remote
+  def push_to_repo
+    return if @remote_type == :none
 
-    create_remote(
+    if @remote_type == :bitbucket
+      puts 'Cannot automatically create BitBucket repository.'
+      puts 'Please, open it manually at https://bitbucket.org/repo/create'
+      `#{ENV['BROWSER']} https://bitbucket.org/repo/create`
+      return
+    end
 
-  #   # Add remote
-  #   if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
-  #     # set-url does not seem to set the fetch value, so we manually put it
-  #     fetch_value = '+refs/heads/*:refs/remotes/origin/*'
-  #     `git config --add remote.origin.fetch '#{fetch_value}'`
+    if [:github, :algolia].include?(@remote_type)
+      user = 'pixelastic'
+      user = 'algolia' if @remote_type == :algolia
+      # Note: This method will fire the browser anyway
+      # https://github.com/node-gh/gh/issues/444
+      command = "gh repo --new #{@name} --user #{user}"
 
-  #     puts '✔ Remote origin set to GitHub'
-  #   else
-  #     puts '✘ Unable to set remote to GitHub'
-  #     exit
-  #   end
+      if command_success?(command)
+        puts '✔ Creating GitHub repository'
+      else
+        puts '✘ Failed to create GitHub repository'
+        exit 1
+      end
 
+      if command_success?('git push origin master')
+        puts '✔ Pushed to repository'
+      else
+        puts '✘ Failed to push to repository'
+        exit 1
+      end
+    end
   end
 
   def run
@@ -92,61 +111,14 @@ class GitDirectoryCreate
     end
 
     create_repo(@path)
+    puts '✔ Creating repository'
     Dir.chdir(@path)
     add_default_files
 
-    set_remote if @remote_type != :none
+    if @remote_type != :none
+      set_remote
+      push_to_repo
+    end
   end
-    
-    # Stop if -n
-    
-    # Create GH repo if GH
-    # pixelastic or algolia
-
-    # Define remote name
-    # Add remote
-
-    # Push
-    # Suggest BitBucket URL if failed
-
-
-  # def create_remote
-  #   return if @is_dry_run
-  #   return unless @remote == :github
-  #   # Create github repo
-  #   `gh repo -N #{@name} &>/dev/null`
-  #   puts '✔ Repository created'
-
-  #   # Add remote
-  #   if system("git remote set-url origin git@github.com:pixelastic/#{@name}")
-  #     # set-url does not seem to set the fetch value, so we manually put it
-  #     fetch_value = '+refs/heads/*:refs/remotes/origin/*'
-  #     `git config --add remote.origin.fetch '#{fetch_value}'`
-
-  #     puts '✔ Remote origin set to GitHub'
-  #   else
-  #     puts '✘ Unable to set remote to GitHub'
-  #     exit
-  #   end
-  # end
-
-  # def push
-  #   return if @is_dry_run
-  #   if system('git push --set-upstream origin master &>/dev/null')
-  #     puts '✔ Pushed'
-  #   else
-  #     puts '✘ Unable to push'
-  #     exit 1
-  #   end
-  # end
-
-  # def run
-  #   cd_to_repo
-  #   init_repo
-  #   add_default_files
-  #   create_remote
-  #   push
-
-  # end
 end
 GitDirectoryCreate.new(*ARGV).run

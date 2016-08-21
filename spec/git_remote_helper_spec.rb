@@ -31,6 +31,16 @@ describe(GitRemoteHelper) do
       expect(actual).to eq false
     end
 
+    it 'should always return true for origin' do
+      # Given
+      create_repository
+
+      # When
+      actual = test_instance.remote?('origin')
+
+      # Then
+      expect(actual).to eq true
+    end
   end
 
   describe 'current_remote' do
@@ -81,6 +91,18 @@ describe(GitRemoteHelper) do
 
       # Then
       expect(actual).to eq false
+    end
+
+    it 'should set the fetch option associated with the remote' do
+      # Given
+      create_repository
+      test_instance.create_remote('upstream', 'url')
+
+      # When
+      actual = test_instance.get_config('remote.upstream.fetch')
+
+      # Then
+      expect(actual).to_not eq nil
     end
   end
 
@@ -201,6 +223,18 @@ describe(GitRemoteHelper) do
 
       # Then
       expect(actual).to eq false
+    end
+
+    it 'should set the fetch as well as the url for origin' do
+      # Given
+      create_repository
+      test_instance.set_remote_url('origin', 'bar')
+
+      # When
+      actual = test_instance.get_config('remote.origin.fetch')
+
+      # Then
+      expect(actual).to_not eq nil
     end
   end
 end
