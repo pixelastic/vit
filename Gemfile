@@ -7,5 +7,5 @@ group :development do
   gem 'flog', '~> 4.3'
   gem 'guard-rspec', '~> 4.6'
   gem 'rspec', '~> 3.0'
-  gem 'rubocop', '~> 0.31'
+  gem 'rubocop', '~> 0.42'
 end
