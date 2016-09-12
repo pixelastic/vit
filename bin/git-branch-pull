@@ -21,7 +21,7 @@ class GitBranchPull
 
     elements = guess_elements(@args)
     @remote_name = elements[:remote]
-    @branch_name = elements[:branch] || elements[:unknown][0]
+    @branch_name = elements[:unknown][0] || elements[:branch]
 
     # Trying to pull a branch from another user on github
     use_branch_as_github_fork(@branch_name) if @branch_name[':']

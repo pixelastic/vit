@@ -7,7 +7,6 @@ module GitArgumentHelper
   # Checks if the specified input looks like a filepath
   # Note: This is a best effort guess as anything could be a filepath
   def path?(input)
-    return true if File.exist?(input)
     return true unless (%r{^\./} =~ input).nil?
     false
   end
@@ -23,7 +22,6 @@ module GitArgumentHelper
   def argument?(input)
     !(input =~ /^--?/).nil?
   end
-
 
   def guess_elements(*inputs)
     # Allow for one array or splats

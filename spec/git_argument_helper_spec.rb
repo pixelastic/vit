@@ -8,17 +8,6 @@ describe(GitArgumentHelper) do
   end
 
   describe 'path?' do
-    it 'should return true if the filepath exists' do
-      # Given
-      create_directory
-
-      # When
-      actual = test_instance.path? @repo_path
-
-      # Then
-      expect(actual).to eq true
-    end
-
     it 'should return true if looks like a filepath' do
       # Given
 
