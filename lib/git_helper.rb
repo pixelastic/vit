@@ -150,7 +150,7 @@ module GitHelper
     # No need to update if the file did not change
     changed_file = `git diff --name-only #{old_commit}..#{current_commit} -- package.json`.strip
     return unless changed_file.length > 0
-    system('npm install')
+    system('yarn')
   end
 
   def never_pushed?
