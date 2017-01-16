@@ -84,9 +84,7 @@ class GitDirectoryCreate
     if [:github, :algolia].include?(@remote_type)
       user = 'pixelastic'
       user = 'algolia' if @remote_type == :algolia
-      # Note: This method will fire the browser anyway
-      # https://github.com/node-gh/gh/issues/444
-      command = "gh repo --new #{@name} --user #{user}"
+      command = "gh repo --new #{@name} --user #{user} --browser false"
 
       if command_success?(command)
         puts '✔ Creating GitHub repository'
