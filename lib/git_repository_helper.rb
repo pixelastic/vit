@@ -49,5 +49,4 @@ module GitRepositoryHelper
     Dir.chdir(current_dir)
     success
   end
-
 end

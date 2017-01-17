@@ -49,11 +49,12 @@ module GitRemoteHelper
 
     # When setting url for origin, we manually also need to set the fetch
     if remote == 'origin' && get_config('remote.origin.fetch').nil?
-      return set_config('remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*')
+      return set_config(
+        'remote.origin.fetch',
+        '+refs/heads/*:refs/remotes/origin/*'
+      )
     end
 
     true
   end
-
-
 end
