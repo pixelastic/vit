@@ -46,7 +46,8 @@ module GitHelper
     remote_algolia: 67,
     tag: 241,
     url: 250,
-    valid: 35
+    valid: 35,
+    date: 24
   }
 
   def color(type)

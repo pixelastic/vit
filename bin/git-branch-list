@@ -14,6 +14,10 @@ class Branch
     @position = parse_position(data[:position])
     @remote = data[:remote]
     @distant_name = data[:distant_name]
+
+    data = commit_info(@hash)
+    @date = data[:date]
+    @date_relative = data[:date_relative]
   end
 
   def parse_position(position)
@@ -34,6 +38,7 @@ class Branch
       display << ' '
     end
 
+
     # Marker
     display << push_pull_indicator(@local_name)
 
@@ -44,6 +49,16 @@ class Branch
     end
 
     display << @hash
+
+    if Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
+      display << " #{@date_relative}"
+                 .gsub('weeks', 'w.')
+                 .gsub('days', 'd.')
+                 .gsub(' ago', '')
+    else
+      display << nil
+    end
+
     display << @message
 
     display
@@ -76,7 +91,7 @@ class GitBranchListAll
         is_branch_gone = (position == 'gone')
         split = distant_name.split('/')
         remote = split.shift
-        distant_name = split.join('/')
+        distant_name = split.join('/').delete(']')
       end
 
       branches << Branch.new(
@@ -102,13 +117,14 @@ class GitBranchListAll
       line[0] = colorize(line[0], color(:valid))
       # Marker
       line[1] = colorize(line[1], branch_color(branch_name.strip))
-
       # Name
       line[2] = colorize(line[2], branch_color(branch_name.strip))
       # hash
       line[3] = colorize(line[3], color(:hash))
+      # date
+      line[4] = colorize(line[4], color(:date))
       # message
-      line[4] = colorize(line[4], color(:message))
+      line[5] = colorize(line[5], color(:message))
       line.join(' ')
     end
     puts output

@@ -25,15 +25,17 @@ module GitCommitHelper
   # Returns a hash of more info about the commit
   def commit_info(sha)
     return nil unless commit?(sha)
-    command = "git log --format=format:'%h%n%ct%n%an%n%s%n%b' -n 1 #{sha}"
+    command = "git log --format=format:'%h%n%ct%n%ar%n%an%n%s%n%b%n' -n 1 #{sha}"
     output = command_stdout(command)
     split = output.split("\n")
+    date = DateTime.strptime(split[1], '%s')
     {
       sha: split[0],
-      date: DateTime.strptime(split[1], '%s'),
-      author: split[2],
-      subject: split[3],
-      body: split[4]
+      date: date,
+      date_relative: split[2],
+      author: split[3],
+      subject: split[4],
+      body: split[5]
     }
   end
 
