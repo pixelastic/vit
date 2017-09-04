@@ -82,9 +82,13 @@ class GitDirectoryCreate
     end
 
     if [:github, :algolia].include?(@remote_type)
-      user = 'pixelastic'
-      user = 'algolia' if @remote_type == :algolia
-      command = "gh repo --new #{@name} --user #{user} --browser false"
+      gh_options = [
+        "--new #{@name}",
+        '--browser false'
+      ]
+      gh_options << "--organization algolia" if @remote_type == :algolia
+      gh_options << "--user pixelastic" if @remote_type == :github
+      command = "gh repo #{gh_options.join(' ')}"
 
       if command_success?(command)
         puts '✔ Creating GitHub repository'
