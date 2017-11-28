@@ -57,4 +57,19 @@ module GitRemoteHelper
 
     true
   end
+
+  # Expand a shorthand username/reponame string to a github url
+  def expand_short_github_url(input)
+    "git@github.com:#{input}.git"
+  end
+
+  # Extract username and reponame form a GitHub url
+  def extract_github_url(input)
+    regex = %r{git@github.com:(.*)/(.*)\.git}
+    matches = regex.match(input).captures
+    {
+      user: matches[0],
+      repo: matches[1]
+    }
+  end
 end

@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe(GitRemoteHelper) do
-  let(:test_instance) { Class.new { include GitHelper }.new }
+  let(:current) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)
@@ -15,7 +15,7 @@ describe(GitRemoteHelper) do
       create_remote('foo')
 
       # When
-      actual = test_instance.remote? 'foo'
+      actual = current.remote? 'foo'
 
       # Then
       expect(actual).to eq true
@@ -26,7 +26,7 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      actual = test_instance.remote? 'do_not_exist'
+      actual = current.remote? 'do_not_exist'
 
       # Then
       expect(actual).to eq false
@@ -37,7 +37,7 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      actual = test_instance.remote?('origin')
+      actual = current.remote?('origin')
 
       # Then
       expect(actual).to eq true
@@ -51,7 +51,7 @@ describe(GitRemoteHelper) do
       create_branch_with_remote('develop', 'upstream')
 
       # When
-      actual = test_instance.current_remote
+      actual = current.current_remote
 
       # Then
       expect(actual).to eq 'upstream'
@@ -62,7 +62,7 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      actual = test_instance.current_remote
+      actual = current.current_remote
 
       # Then
       expect(actual).to eq 'origin'
@@ -75,8 +75,8 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      test_instance.create_remote('foo', 'url')
-      actual = test_instance.remote?('foo')
+      current.create_remote('foo', 'url')
+      actual = current.remote?('foo')
 
       # Then
       expect(actual).to eq true
@@ -85,10 +85,10 @@ describe(GitRemoteHelper) do
     it 'should return false if trying to overide an existing remote' do
       # Given
       create_repository
-      test_instance.create_remote('foo', 'url')
+      current.create_remote('foo', 'url')
 
       # When
-      actual = test_instance.create_remote('foo', 'url again')
+      actual = current.create_remote('foo', 'url again')
 
       # Then
       expect(actual).to eq false
@@ -97,10 +97,10 @@ describe(GitRemoteHelper) do
     it 'should set the fetch option associated with the remote' do
       # Given
       create_repository
-      test_instance.create_remote('upstream', 'url')
+      current.create_remote('upstream', 'url')
 
       # When
-      actual = test_instance.get_config('remote.upstream.fetch')
+      actual = current.get_config('remote.upstream.fetch')
 
       # Then
       expect(actual).to_not eq nil
@@ -113,7 +113,7 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      actual = test_instance.set_current_remote('foo')
+      actual = current.set_current_remote('foo')
 
       # Then
       expect(actual).to eq false
@@ -122,10 +122,10 @@ describe(GitRemoteHelper) do
     it 'should return false if not specified branch does not exist' do
       # Given
       create_repository
-      test_instance.create_remote('upstream', 'url')
+      current.create_remote('upstream', 'url')
 
       # When
-      actual = test_instance.set_current_remote('upstream', 'develop')
+      actual = current.set_current_remote('upstream', 'develop')
 
       # Then
       expect(actual).to eq false
@@ -134,10 +134,10 @@ describe(GitRemoteHelper) do
     it 'should return false if not currently in a branch' do
       # Given
       create_repository
-      test_instance.create_remote('upstream', 'url')
+      current.create_remote('upstream', 'url')
 
       # When
-      actual = test_instance.set_current_remote('upstream')
+      actual = current.set_current_remote('upstream')
 
       # Then
       expect(actual).to eq false
@@ -147,11 +147,11 @@ describe(GitRemoteHelper) do
       # Given
       create_repository
       create_branch('develop')
-      test_instance.create_remote('upstream', 'url')
+      current.create_remote('upstream', 'url')
 
       # When
-      test_instance.set_current_remote('upstream')
-      actual = test_instance.current_remote
+      current.set_current_remote('upstream')
+      actual = current.current_remote
 
       # Then
       expect(actual).to eq 'upstream'
@@ -161,11 +161,11 @@ describe(GitRemoteHelper) do
       # Given
       create_repository
       create_branch('develop')
-      test_instance.create_remote('upstream', 'url')
+      current.create_remote('upstream', 'url')
 
       # When
-      test_instance.set_current_remote('upstream')
-      actual = test_instance.set_current_remote('upstream')
+      current.set_current_remote('upstream')
+      actual = current.set_current_remote('upstream')
 
       # Then
       expect(actual).to eq false
@@ -176,10 +176,10 @@ describe(GitRemoteHelper) do
     it 'should return the url of the specified remote' do
       # Given
       create_repository
-      test_instance.create_remote('foo', 'url')
+      current.create_remote('foo', 'url')
 
       # When
-      actual = test_instance.remote_url('foo')
+      actual = current.remote_url('foo')
 
       # Then
       expect(actual).to eq 'url'
@@ -190,7 +190,7 @@ describe(GitRemoteHelper) do
       create_repository
 
       # When
-      actual = test_instance.remote_url('foo')
+      actual = current.remote_url('foo')
 
       # Then
       expect(actual).to eq false
@@ -204,11 +204,11 @@ describe(GitRemoteHelper) do
     it 'should change the url of the specified remote' do
       # Given
       create_repository
-      test_instance.create_remote('upstream', 'foo')
+      current.create_remote('upstream', 'foo')
 
       # When
-      test_instance.set_remote_url('upstream', 'bar')
-      actual = test_instance.remote_url('upstream')
+      current.set_remote_url('upstream', 'bar')
+      actual = current.remote_url('upstream')
 
       # Then
       expect(actual).to eq 'bar'
@@ -217,10 +217,10 @@ describe(GitRemoteHelper) do
     it 'should return false if no such remote' do
       # Given
       create_repository
-      test_instance.create_remote('upstream', 'foo')
+      current.create_remote('upstream', 'foo')
 
       # When
-      actual = test_instance.set_remote_url('foobar', 'bar')
+      actual = current.set_remote_url('foobar', 'bar')
 
       # Then
       expect(actual).to eq false
@@ -229,13 +229,26 @@ describe(GitRemoteHelper) do
     it 'should set the fetch as well as the url for origin' do
       # Given
       create_repository
-      test_instance.set_remote_url('origin', 'bar')
+      current.set_remote_url('origin', 'bar')
 
       # When
-      actual = test_instance.get_config('remote.origin.fetch')
+      actual = current.get_config('remote.origin.fetch')
 
       # Then
       expect(actual).to_not eq nil
     end
+  end
+
+  describe '.expand_short_github_url' do
+    subject { current.expand_short_github_url(input) }
+    let(:input) { 'username/reponame' }
+    it { should eq 'git@github.com:username/reponame.git' }
+  end
+
+  describe '.extract_github_url' do
+    subject { current.extract_github_url(input) }
+    let(:input) { 'git@github.com:username/reponame.git' }
+    it { should include(user: 'username') }
+    it { should include(repo: 'reponame') }
   end
 end

@@ -18,6 +18,13 @@ module GitArgumentHelper
     !(regexp =~ input).nil?
   end
 
+  # Check if the specific input looks like a shorthand username/reponame url
+  def github_short_url?(input)
+    # Example: username/reponame
+    regexp = %r{^(.*)/(.*)$}
+    !(regexp =~ input).nil?
+  end
+
   # Checks if the specified input looks like a command line argument
   def argument?(input)
     !(input =~ /^--?/).nil?

@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 require_relative '../lib/git_helper'
 
-Remote = Struct.new(:name, :url)
-
 # List all remotes
 #
 # Usage :
@@ -23,7 +21,7 @@ class GitRemoteList
       next unless match
       name, url, type = match.captures
       next if type == 'fetch'
-      remotes << Remote.new(name, url)
+      remotes << { name: name, url: url }
     end
     remotes
   end

@@ -117,7 +117,6 @@ module GitHelper
 
   def longest_by_type(list, type)
     ordered = list.map { |obj| obj[type] }.group_by(&:size)
-    return nil if ordered.zero?
     ordered.max.last[0]
   end
 

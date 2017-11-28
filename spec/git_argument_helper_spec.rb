@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe(GitArgumentHelper) do
-  let(:test_instance) { Class.new { include GitHelper }.new }
+  let(:current) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)
@@ -13,7 +13,7 @@ describe(GitArgumentHelper) do
       # Given
 
       # When
-      actual = test_instance.path?('./somewhere')
+      actual = current.path?('./somewhere')
 
       # Then
       expect(actual).to eq true
@@ -25,10 +25,23 @@ describe(GitArgumentHelper) do
       # Given
 
       # When
-      actual = test_instance.url?('git@github.com:pixelastic/vit.git')
+      actual = current.url?('git@github.com:pixelastic/vit.git')
 
       # Then
       expect(actual).to eq true
+    end
+  end
+
+  describe '.github_short_url?' do
+    subject { current.github_short_url?(input) }
+
+    context 'with a real github url' do
+      let(:input) { 'username/reponame' }
+      it { should eq true }
+    end
+    context 'with a non-github url' do
+      let(:input) { 'something:something.git' }
+      it { should eq false }
     end
   end
 
@@ -37,7 +50,7 @@ describe(GitArgumentHelper) do
       # Given
 
       # When
-      actual = test_instance.argument?('-n')
+      actual = current.argument?('-n')
 
       # Then
       expect(actual).to eq true
@@ -47,7 +60,7 @@ describe(GitArgumentHelper) do
       # Given
 
       # When
-      actual = test_instance.argument?('--bitbucket')
+      actual = current.argument?('--bitbucket')
 
       # Then
       expect(actual).to eq true
@@ -62,7 +75,7 @@ describe(GitArgumentHelper) do
       input = ['develop']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:branch]).to eq 'develop'
@@ -75,7 +88,7 @@ describe(GitArgumentHelper) do
       input = ['v1']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:tag]).to eq 'v1'
@@ -88,7 +101,7 @@ describe(GitArgumentHelper) do
       input = ['foo']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:remote]).to eq 'foo'
@@ -99,7 +112,7 @@ describe(GitArgumentHelper) do
       input = ['foo@bar:baz.git']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:url]).to eq 'foo@bar:baz.git'
@@ -110,7 +123,7 @@ describe(GitArgumentHelper) do
       input = ['./path']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:path]).to eq './path'
@@ -121,7 +134,7 @@ describe(GitArgumentHelper) do
       input = ['-n', '--bitbucket']
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:arguments]).to include('-n')
@@ -136,7 +149,7 @@ describe(GitArgumentHelper) do
       input = %w[develop v1 upstream]
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:branch]).to eq 'develop'
@@ -152,7 +165,7 @@ describe(GitArgumentHelper) do
       input = %w[develop v1 upstream]
 
       # When
-      actual = test_instance.guess_elements(*input)
+      actual = current.guess_elements(*input)
 
       # Then
       expect(actual[:branch]).to eq 'develop'
@@ -167,7 +180,7 @@ describe(GitArgumentHelper) do
       input = []
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:branch]).to eq 'develop'
@@ -180,7 +193,7 @@ describe(GitArgumentHelper) do
       input = []
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:tag]).to eq 'v1'
@@ -192,7 +205,7 @@ describe(GitArgumentHelper) do
       input = []
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:remote]).to eq 'origin'
@@ -204,7 +217,7 @@ describe(GitArgumentHelper) do
       input = %w[foo bar]
 
       # When
-      actual = test_instance.guess_elements(input)
+      actual = current.guess_elements(input)
 
       # Then
       expect(actual[:unknown]).to eq %w[foo bar]
@@ -216,8 +229,8 @@ describe(GitArgumentHelper) do
       input2 = ['foo@bar:baz.git', './path']
 
       # When
-      actual1 = test_instance.guess_elements(input1)
-      actual2 = test_instance.guess_elements(input2)
+      actual1 = current.guess_elements(input1)
+      actual2 = current.guess_elements(input2)
 
       # Then
       expect(actual1).to eq actual2

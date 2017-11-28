@@ -1,34 +1,72 @@
-#!/usr/bin/env zsh
-# Creates a new remote, and auto-track its branches
+#!/usr/bin/env ruby
+require_relative '../lib/git_helper'
+# Wrapper for creating a new remote
 # Usage:
-# $ git-remote-create {remoteName} {remoteUrl}
-# $ git-remote-create {remoteUrl} {remoteName}
+# $ git remote-create {name} {url}
+# $ git remote-create {url} {name}
+#
+# {url} can be a full git url, but it can also simply be username/reponame and
+# it will be converted to a GitHub url
+#
+# If only specifying a {name} with no url on a github repo, it will use this
+# name as the basis for the forked version
+class GitRemoteCreate
+  include GitHelper
 
-local remoteName=$1
-local remoteUrl=$2
+  def initialize(*args)
+    args = get_real_args(args)
 
-# Maybe we swapped name and url ? We'll try to swap them back
-if [[ $remoteName =~ \.git$ ]]; then
-  local tmp=$remoteName
-  remoteName=$remoteUrl
-  remoteUrl=$tmp
-fi
+    if args.size == 1
+      init_only_name(args[0])
+    else
+      init_two_args(args[0], args[1])
+    end
+  end
 
-# If not name given, we'll use the owner of the repo
-if [[ $remoteName == '' ]]; then
-  remoteName=$(echo $remoteUrl | sed 's/^\(.*\)@\(.*\):\(.*\)\/\(.*\)/\3/')
-fi
+  def init_two_args(name, url)
+    # Cheking that the url is valid
+    if url?(url)
+      @name = name
+      @url = url
+      return
+    end
 
-if git remote add $remoteName $remoteUrl 1>/dev/null; then
-  echo "✔ Add remote $remoteName";
-else
-  echo "✘ Unable to add remote"
-  exit 1
-fi
+    # Maybe the url and name have been swapped?
+    if url?(name)
+      @name = url
+      @url = name
+      return
+    end
 
-if git fetch --quiet $remoteName; then
-  echo "✔ Fetch branches"
-else
-  echo "✘ Unable to fetch branches"
-  exit 1
-fi
+    # Maybe the url is actually given in short github form
+    if github_short_url?(url)
+      @name = name
+      @url = expand_short_github_url(url)
+      return
+    end
+
+    # Final case, short github url and name have been swapped
+    @name = url
+    @url = expand_short_github_url(name)
+  end
+
+  # We'll use this name as the name of our fork
+  def init_only_name(name)
+    github_info = extract_github_url(remote_url('origin'))
+    @name = name
+    @url = expand_short_github_url("#{name}/#{github_info[:repo]}")
+  end
+
+  def create_local_branch
+    system("git checkout -b #{@branchName}")
+  end
+
+  def create_from_remote_branch
+    system("git checkout -b #{@branchName} #{@remoteName}/#{@branchName}")
+  end
+
+  def run
+    create_remote(@name, @url)
+  end
+end
+GitRemoteCreate.new(*ARGV).run
