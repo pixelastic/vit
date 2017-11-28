@@ -101,7 +101,7 @@ module GitHelper
 
   def push_pull_indicator(branch_name)
     return ' ' if branch_gone?(branch_name)
-    system("git branch-remote-status #{branchName}")
+    system("git branch-remote-status #{branch_name}")
     code = $CHILD_STATUS.exitstatus
     return ' ' if code == 1
     return ' ' if code == 2
