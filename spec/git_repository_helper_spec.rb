@@ -1,7 +1,8 @@
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 describe(GitRepositoryHelper) do
-  let (:test_instance) { Class.new { include GitHelper }.new }
+  let(:test_instance) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)
@@ -234,7 +235,7 @@ describe(GitRepositoryHelper) do
       expect(test_instance.repository?(@repo_path)).to eq true
     end
 
-    it 'creates a git repository even if the specified directory does not exist' do
+    it 'creates a repository even if the specified directory does not exist' do
       # Given
       create_directory
       move_out_of_directory
@@ -247,5 +248,4 @@ describe(GitRepositoryHelper) do
       expect(test_instance.repository?(subdir)).to eq true
     end
   end
-
 end

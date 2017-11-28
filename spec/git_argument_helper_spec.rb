@@ -1,7 +1,8 @@
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 describe(GitArgumentHelper) do
-  let (:test_instance) { Class.new { include GitHelper }.new }
+  let(:test_instance) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)
@@ -132,7 +133,7 @@ describe(GitArgumentHelper) do
       create_repository
       create_branch_with_remote('develop', 'upstream')
       create_tag 'v1'
-      input = %w(develop v1 upstream)
+      input = %w[develop v1 upstream]
 
       # When
       actual = test_instance.guess_elements(input)
@@ -148,7 +149,7 @@ describe(GitArgumentHelper) do
       create_repository
       create_branch_with_remote('develop', 'upstream')
       create_tag 'v1'
-      input = %w(develop v1 upstream)
+      input = %w[develop v1 upstream]
 
       # When
       actual = test_instance.guess_elements(*input)
@@ -200,13 +201,13 @@ describe(GitArgumentHelper) do
     it 'should put all unknown in a special attribute' do
       # Given
       create_repository
-      input = %w(foo bar)
+      input = %w[foo bar]
 
       # When
       actual = test_instance.guess_elements(input)
 
       # Then
-      expect(actual[:unknown]).to eq %w(foo bar)
+      expect(actual[:unknown]).to eq %w[foo bar]
     end
 
     it 'should guess path and url' do

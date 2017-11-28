@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe(CommandHelper) do
-  let (:instance) { Class.new { include CommandHelper }.new }
+  let(:instance) { Class.new { include CommandHelper }.new }
 
   describe 'command_success?' do
     it 'should return true if command works' do

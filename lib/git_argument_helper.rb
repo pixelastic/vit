@@ -27,7 +27,7 @@ module GitArgumentHelper
     # Allow for one array or splats
     inputs = inputs[0] if inputs.length == 1
 
-    types = %w(remote tag branch url path)
+    types = %w[remote tag branch url path]
     elements = {
       unknown: [],
       arguments: []
@@ -81,5 +81,4 @@ module GitArgumentHelper
 
     elements
   end
-
 end

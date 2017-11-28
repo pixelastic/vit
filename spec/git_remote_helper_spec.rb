@@ -1,7 +1,8 @@
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 describe(GitRemoteHelper) do
-  let (:test_instance) { Class.new { include GitHelper }.new }
+  let(:test_instance) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)
@@ -156,7 +157,7 @@ describe(GitRemoteHelper) do
       expect(actual).to eq 'upstream'
     end
 
-    it 'should return false if the specified remote is already the current one' do
+    it 'should return false if the remote is already the current one' do
       # Given
       create_repository
       create_branch('develop')

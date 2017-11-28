@@ -1,7 +1,8 @@
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 describe(GitCommitHelper) do
-  let (:test_instance) { Class.new { include GitHelper }.new }
+  let(:test_instance) { Class.new { include GitHelper }.new }
 
   after(:each) do |example|
     delete_directory(example)

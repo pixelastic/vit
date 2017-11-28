@@ -27,7 +27,7 @@ module GitHelper
   include GitRepositoryHelper
   include GitTagHelper
 
-  @@colors = {
+  COLORS = {
     branch: 202,
     branch_gone: 160,
     branch_bugfix: 203,
@@ -48,24 +48,24 @@ module GitHelper
     url: 250,
     valid: 35,
     date: 24
-  }
+  }.freeze
 
   def color(type)
-    @@colors[type]
+    COLORS[type]
   end
 
   def branch_color(branch)
-    return @@colors[:branch_gone] if branch_gone?(branch)
+    return COLORS[:branch_gone] if branch_gone?(branch)
     return nil if branch.nil?
     color_symbol = ('branch_' + branch.tr('-', '_')).to_sym
-    return @@colors[color_symbol] if @@colors[color_symbol]
-    @@colors[:branch]
+    return COLORS[color_symbol] if COLORS[color_symbol]
+    COLORS[:branch]
   end
 
   def remote_color(remote)
     color_symbol = ('remote_' + remote).to_sym
-    return @@colors[color_symbol] if @@colors[color_symbol]
-    @@colors[:remote]
+    return COLORS[color_symbol] if COLORS[color_symbol]
+    COLORS[:remote]
   end
 
   # Return only --flags
@@ -99,8 +99,8 @@ module GitHelper
     end
   end
 
-  def push_pull_indicator(branchName)
-    return ' ' if branch_gone?(branchName)
+  def push_pull_indicator(branch_name)
+    return ' ' if branch_gone?(branch_name)
     system("git branch-remote-status #{branchName}")
     code = $CHILD_STATUS.exitstatus
     return ' ' if code == 1
@@ -117,7 +117,7 @@ module GitHelper
 
   def longest_by_type(list, type)
     ordered = list.map { |obj| obj[type] }.group_by(&:size)
-    return nil if ordered.size == 0
+    return nil if ordered.zero?
     ordered.max.last[0]
   end
 
@@ -131,8 +131,8 @@ module GitHelper
     tags.uniq
   end
 
-  def closer_commit(commitA, commitB)
-    `git-commit-closer #{commitA} #{commitB}`.strip
+  def closer_commit(commit_a, commit_b)
+    `git-commit-closer #{commit_a} #{commit_b}`.strip
   end
 
   def remote_owner(remote)
@@ -143,16 +143,16 @@ module GitHelper
     system("git branch-gone #{name}")
   end
 
-
-
   # Run npm install if package.json changed since old_commit
   def npm_install(old_commit)
     root = repo_root
     # No need to update if not an npm project
     return unless File.exist?(File.join(root, 'node_modules'))
     # No need to update if the file did not change
-    changed_file = `git diff --name-only #{old_commit}..#{current_commit} -- package.json`.strip
-    return unless changed_file.length > 0
+    command = 'git diff --name-only '\
+      "#{old_commit}..#{current_commit} -- package.json"
+    changed_file = `#{command}`.strip
+    return if changed_file.empty?
     system('yarn')
   end
 
@@ -183,5 +183,4 @@ module GitHelper
     end
     padded_array
   end
-
 end
