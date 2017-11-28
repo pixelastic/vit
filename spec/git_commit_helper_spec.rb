@@ -98,7 +98,7 @@ describe(GitCommitHelper) do
       expect(actual[:subject]).to eq 'Subject'
       expect(actual[:body]).to eq 'Body'
       expect(actual).to have_key(:author)
-      expect(actual[:date]).to be_instance_of(DateTime)
+      expect(actual[:date]).to be_instance_of(Date)
     end
   end
 

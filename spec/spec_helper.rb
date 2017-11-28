@@ -1,5 +1,6 @@
 require 'awesome_print'
 require 'fileutils'
+require 'tmpdir'
 require './lib/git_helper.rb'
 
 RSpec.configure do |config|
