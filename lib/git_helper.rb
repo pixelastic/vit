@@ -30,6 +30,7 @@ module GitHelper
   COLORS = {
     branch: 202,
     branch_gone: 160,
+
     branch_bugfix: 203,
     branch_develop: 184,
     branch_gh_pages: 24,
@@ -39,11 +40,12 @@ module GitHelper
     hash: 67,
     message: 250,
     remote: 202,
+    remote_algolia: 67,
     remote_github: 24,
     remote_heroku: 141,
     remote_origin: 184,
+    remote_pixelastic: 69,
     remote_upstream: 69,
-    remote_algolia: 67,
     tag: 241,
     url: 250,
     valid: 35,
