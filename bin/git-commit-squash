@@ -9,5 +9,5 @@ if [[ $commitHash = '' ]]; then
   exit 1
 fi
 
-git reset --soft "${commitHash}~1"
+git reset --soft "${commitHash}"
 git commit --edit -m"$(git log --format=%B --reverse HEAD..HEAD@{1})"
