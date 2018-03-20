@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require_relative '../lib/git_helper'
-require 'awesome_print'
 
 # Branch representation
 class Branch

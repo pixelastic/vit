@@ -1,4 +1,3 @@
-require 'awesome_print'
 require 'open3'
 
 # Simplified access to shell commands

@@ -14,8 +14,6 @@ Gem::Specification.new do |gem|
   gem.licenses = ['MIT']
 
   # Dependencies
-  gem.add_runtime_dependency 'awesome_print', '~> 1.8'
-
   gem.add_development_dependency 'flay', '~> 2.6'
   gem.add_development_dependency 'flog', '~> 4.3'
   gem.add_development_dependency 'guard-rspec', '~> 4.6'
