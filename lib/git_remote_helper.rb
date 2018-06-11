@@ -6,7 +6,6 @@ module GitRemoteHelper
 
   # Checks if the specified remote exists
   def remote?(name)
-    return true if name == 'origin'
     !get_config("remote.#{name}.url").nil?
   end
 

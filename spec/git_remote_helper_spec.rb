@@ -31,17 +31,6 @@ describe(GitRemoteHelper) do
       # Then
       expect(actual).to eq false
     end
-
-    it 'should always return true for origin' do
-      # Given
-      create_repository
-
-      # When
-      actual = current.remote?('origin')
-
-      # Then
-      expect(actual).to eq true
-    end
   end
 
   describe 'current_remote' do
@@ -229,6 +218,7 @@ describe(GitRemoteHelper) do
     it 'should set the fetch as well as the url for origin' do
       # Given
       create_repository
+      current.create_remote('origin', 'foo')
       current.set_remote_url('origin', 'bar')
 
       # When
