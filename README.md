@@ -18,6 +18,7 @@ index.
 ## Commands
 
 | command | Action                                              | 
+|---------|-----------------------------------------------------|
 | `vbM`   | Merge branch with specified one                     | 
 | `vbRr`  | Remove specified remote branch                      | 
 | `vbR`   | Remove specified branch                             | 
