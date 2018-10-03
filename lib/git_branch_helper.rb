@@ -35,4 +35,9 @@ module GitBranchHelper
       ahead: ahead.to_i
     }
   end
+
+  def branch_date_ago(branch_name)
+    command = "git show --pretty=format:'%cr' #{branch_name} | head -1"
+    command_stdout(command)
+  end
 end

@@ -45,13 +45,16 @@ class BranchListRemote
 
     @branch_list.each do |branch|
       branch_name = branch[:branch]
+      remote_branch_name = "#{@remoteName}/#{branch_name}"
 
-      difference = difference("#{@remoteName}/#{branch_name}")
+      difference = difference(remote_branch_name)
+      date_ago = branch_date_ago(remote_branch_name)
 
       colored_branch_name = colorize(branch_name.ljust(longest_branch.size), branch_color(branch[:branch]))
       colored_hash = colorize(branch[:hash], color(:hash))
+      colored_date = colorize(date_ago, color(:date))
 
-      puts "  #{colored_branch_name}  #{colored_hash}  #{difference}"
+      puts "  #{colored_branch_name}  #{colored_hash}  #{difference} #{colored_date}"
     end
   end
 
