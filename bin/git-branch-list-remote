@@ -26,15 +26,32 @@ class BranchListRemote
     return branches
   end
 
+  def difference(branch_name)
+    difference = branch_difference('master', branch_name)
+    
+    ahead = difference[:ahead] > 0 ? "  #{difference[:ahead]} ahead" : ""
+    behind = difference[:behind] > 0 ? "  #{difference[:behind]} behind" : ""
+
+    return [
+      colorize(ahead.ljust(15), color(:ahead)),
+      colorize(behind.ljust(15), color(:behind))
+    ].join(' ')
+  end
+
   def run
     @branch_list = branch_list
 
     longest_branch = @branch_list.map {|obj| obj[:branch] }.group_by(&:size).max.last[0]
 
     @branch_list.each do |branch|
-      branch_name = colorize(branch[:branch].ljust(longest_branch.size), branch_color(branch[:branch]))
-      hash = colorize(branch[:hash], color(:hash))
-      puts "  #{branch_name}  #{hash}"
+      branch_name = branch[:branch]
+
+      difference = difference("#{@remoteName}/#{branch_name}")
+
+      colored_branch_name = colorize(branch_name.ljust(longest_branch.size), branch_color(branch[:branch]))
+      colored_hash = colorize(branch[:hash], color(:hash))
+
+      puts "  #{colored_branch_name}  #{colored_hash}  #{difference}"
     end
   end
 

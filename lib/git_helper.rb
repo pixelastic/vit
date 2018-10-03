@@ -48,7 +48,9 @@ module GitHelper
     tag: 241,
     url: 250,
     valid: 35,
-    date: 24
+    date: 24,
+    ahead: 34,
+    behind: 203
   }.freeze
 
   def color(type)

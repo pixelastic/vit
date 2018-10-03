@@ -24,4 +24,15 @@ module GitBranchHelper
     command = "git checkout --quiet -b #{branch}"
     command_success?(command)
   end
+
+  # Returns the number of commits ahead/behind two branches are
+  def branch_difference(branch_a, branch_b)
+    command = "git rev-list --left-right --count #{branch_a}...#{branch_b}"
+    result = command_stdout(command)
+    behind, ahead = result.split("\t")
+    return {
+      behind: behind.to_i,
+      ahead: ahead.to_i
+    }
+  end
 end
