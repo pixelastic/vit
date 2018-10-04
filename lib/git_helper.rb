@@ -60,14 +60,17 @@ module GitHelper
   def branch_color(branch)
     return COLORS[:branch_gone] if branch_gone?(branch)
     return nil if branch.nil?
+
     color_symbol = ('branch_' + branch.tr('-', '_')).to_sym
     return COLORS[color_symbol] if COLORS[color_symbol]
+
     COLORS[:branch]
   end
 
   def remote_color(remote)
     color_symbol = ('remote_' + remote).to_sym
     return COLORS[color_symbol] if COLORS[color_symbol]
+
     COLORS[:remote]
   end
 
@@ -98,12 +101,14 @@ module GitHelper
       next 'origin' if element == 'o'
       next 'release' if element == 'r'
       next 'upstream' if element == 'u'
+
       element
     end
   end
 
   def push_pull_indicator(branch_name)
     return ' ' if branch_gone?(branch_name)
+
     system("git branch-remote-status #{branch_name}")
     code = $CHILD_STATUS.exitstatus
     return ' ' if code == 1
@@ -114,6 +119,7 @@ module GitHelper
 
   def colorize(text, color)
     return nil if color.nil?
+
     color = format('%03d', color)
     "[38;5;#{color}m#{text}[00m"
   end
@@ -150,17 +156,20 @@ module GitHelper
     root = repo_root
     # No need to update if not an npm project
     return unless File.exist?(File.join(root, 'node_modules'))
+
     # No need to update if the file did not change
     command = 'git diff --name-only '\
       "#{old_commit}..#{current_commit} -- package.json"
     changed_file = `#{command}`.strip
     return if changed_file.empty?
+
     system('yarn')
   end
 
   def never_pushed?
     system('git branch-remote-status')
     return true if $CHILD_STATUS.exitstatus == 4
+
     false
   end
 

@@ -8,11 +8,13 @@ module GitConfigHelper
     command = "git config --get #{name}"
     output = command_stdout(command)
     return nil if output.empty?
+
     output
   end
 
   def set_config(name, value)
     return false if name['.'].nil?
+
     command = "git config #{name} '#{value}'"
     command_success?(command)
   end

@@ -8,6 +8,7 @@ module GitArgumentHelper
   # Note: This is a best effort guess as anything could be a filepath
   def path?(input)
     return true unless (%r{^\./} =~ input).nil?
+
     false
   end
 
@@ -69,6 +70,7 @@ module GitArgumentHelper
 
       # Already set
       next if elements.key?(type_sym)
+
       # Setting default if such a default is even possible
       if respond_to?(current_type_method)
         elements[type_sym] = send(current_type_method)

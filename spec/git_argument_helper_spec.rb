@@ -237,3 +237,4 @@ describe(GitArgumentHelper) do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

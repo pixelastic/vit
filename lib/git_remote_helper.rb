@@ -13,12 +13,14 @@ module GitRemoteHelper
   def current_remote
     remote = get_config("branch.#{current_branch}.remote")
     return 'origin' if remote.nil?
+
     remote
   end
 
   # Set the current remote as the specified one
   def set_current_remote(remote, branch = nil)
     return false unless remote?(remote)
+
     branch = current_branch if branch.nil?
     return false if branch == 'HEAD'
     return false unless branch?(branch)
@@ -30,6 +32,7 @@ module GitRemoteHelper
   # Create the specified remote with specified url
   def create_remote(name, url)
     return false if remote?(name)
+
     command = "git remote add '#{name}' '#{url}'"
     command_success?(command)
   end
@@ -37,12 +40,14 @@ module GitRemoteHelper
   # Returns the url of a given remote
   def remote_url(name)
     return false unless remote?(name)
+
     get_config("remote.#{name}.url")
   end
 
   # Set the remote url
   def set_remote_url(remote, url)
     return false unless remote?(remote)
+
     command = "git remote set-url #{remote} '#{url}'"
     return false unless command_success?(command)
 

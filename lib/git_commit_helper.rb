@@ -16,15 +16,18 @@ module GitCommitHelper
   # Returns hash of current commit
   def current_commit
     return false unless repository?
+
     command = "git log --pretty=format:'%h' -n 1"
     output = command_stdout(command)
     return nil if output.empty?
+
     output
   end
 
   # Returns a hash of more info about the commit
   def commit_info(sha)
     return nil unless commit?(sha)
+
     command = 'git log '\
       "--format=format:'%h%n%ct%n%ar%n%an%n%s%n%b%n' -n 1 #{sha}"
     output = command_stdout(command)

@@ -15,6 +15,7 @@ module GitTagHelper
     command = 'git describe --tags --abbrev=0'
     tag = command_stdout(command)
     return nil if tag == ''
+
     tag
   end
 end

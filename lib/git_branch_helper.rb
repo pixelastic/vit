@@ -30,7 +30,7 @@ module GitBranchHelper
     command = "git rev-list --left-right --count #{branch_a}...#{branch_b}"
     result = command_stdout(command)
     behind, ahead = result.split("\t")
-    return {
+    {
       behind: behind.to_i,
       ahead: ahead.to_i
     }

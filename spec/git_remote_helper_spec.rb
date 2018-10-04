@@ -242,3 +242,4 @@ describe(GitRemoteHelper) do
     it { should include(repo: 'reponame') }
   end
 end
+# rubocop:enable Metrics/BlockLength
