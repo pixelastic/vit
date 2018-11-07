@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+# Update the ./scripts/bin/coriolis submodule with message:
+# chore(vit): Update coriolis submodule
+
+cd $(git root)
+git add ./scripts/bin/coriolis
+git commit -m "chore(coriolis): Update coriolis submodule"
