@@ -25,6 +25,9 @@ class GitRemotePush
   end
 
   def run
+    # Pull the branch first to make sure we're up to date
+    system('git branch-pull')
+
     is_pushing_to_default_remote = (@remote_name == current_remote)
 
     # Pushing to default remote for the first time
