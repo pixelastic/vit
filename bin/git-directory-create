@@ -12,6 +12,7 @@ require_relative '../lib/git_helper'
 #  -n : Do not add any remote
 #  -b : Set the remote to BitBucket
 #  -a : Create the remote under the Algolia namespace
+#  -p : Set the repo as private (GitHub only)
 class GitDirectoryCreate
   include GitHelper
   def initialize(*args)
@@ -32,6 +33,9 @@ class GitDirectoryCreate
     @remote_type = :algolia if elements[:arguments].include?('-a')
     @remote_type = :bitbucket if elements[:arguments].include?('-b')
     @remote_type = :none if elements[:arguments].include?('-n')
+
+    # Set private
+    @is_private = elements[:arguments].include?('-p')
   end
 
   # Adds readme and gitignore
@@ -93,6 +97,7 @@ class GitDirectoryCreate
     ]
     gh_options << '--organization algolia' if @remote_type == :algolia
     gh_options << '--user pixelastic' if @remote_type == :github
+    gh_options << '--type private' if @is_private
     command = "gh repo #{gh_options.join(' ')}"
 
     if command_success?(command)
