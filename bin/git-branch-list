@@ -32,7 +32,7 @@ class Branch
     display = []
     # Mark current branch
     if current?
-      display << ''
+      display << ''
     else
       display << ' '
     end
@@ -50,7 +50,7 @@ class Branch
     display << @hash
 
     if Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
-      display << " #{@date_relative}"
+      display << " #{@date_relative}"
                  .gsub('weeks', 'w.')
                  .gsub('days', 'd.')
                  .gsub(' ago', '')

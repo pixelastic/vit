@@ -107,14 +107,14 @@ module GitHelper
   end
 
   def push_pull_indicator(branch_name)
-    return ' ' if branch_gone?(branch_name)
+    return ' ' if branch_gone?(branch_name)
 
     system("git branch-remote-status #{branch_name}")
     code = $CHILD_STATUS.exitstatus
-    return ' ' if code == 1
-    return ' ' if code == 2
-    return ' ' if code == 3
-    return ' ' if code == 4
+    return ' ' if code == 1
+    return ' ' if code == 2
+    return ' ' if code == 3
+    return ' ' if code == 4
   end
 
   def colorize(text, color)

@@ -52,7 +52,7 @@ class TagList
   end
 
   def output_current_tag(tag)
-    return colorize("", color(:valid)) if @currentTags.include? tag
+    return colorize("", color(:valid)) if @currentTags.include? tag
     return " "
   end
 
