@@ -4,18 +4,6 @@
 # $ git-branch-remote-status
 # $ git-branch-remote-status branch
 #
-# Will return a different exit code in each case :
-
-# 0. Local is same as remote
-local EXIT_CODE_IDENTICAL=0
-# 1. Local is ahead of remote (need to push)
-local EXIT_CODE_AHEAD=1
-# 2. Local is behind remote (need to pull)
-local EXIT_CODE_BEHIND=2
-# 3. Local and remote have diverged
-local EXIT_CODE_DIVERGED=3
-# 4. Local has never been pushed to server
-local EXIT_CODE_NEVER_PUSHED=4
 
 local branchName=$1
 if [[ "$branchName" = '' ]]; then
@@ -25,25 +13,29 @@ fi
 local remoteHead=$(git rev-parse $branchName@{upstream} 2>/dev/null)
 # Remote has no hash, means it never get pushed
 if [[ "$remoteHead" = '' ]]; then
-  exit $EXIT_CODE_NEVER_PUSHED
+  echo "local_never_pushed"
+  exit
 fi
 
 local localHead=$(git rev-parse $branchName@{0} 2>/dev/null)
 # Local is same as remote
 if [[ "$remoteHead" = "$localHead" ]]; then
-  exit $EXIT_CODE_IDENTICAL
+  echo "local_identical"
+  exit
 fi
 
 local remoteMergeBase=$(git merge-base $branchName@{0} $branchName@{upstream} 2>/dev/null)
 # Merge base is the same as remote, it means we are ahead
 if [[ "$remoteHead" = "$remoteMergeBase" ]]; then
-  exit $EXIT_CODE_AHEAD
+  echo "local_ahead"
+  exit
 fi
 
 # Merge base is the same as local, it means we are behind
 if [[ "$localHead" = "$remoteMergeBase" ]]; then
-  exit $EXIT_CODE_BEHIND
+  echo "local_behind"
+  exit
 fi
 
 # Any other case means we've diverged
-exit $EXIT_CODE_DIVERGED
+echo "local_diverged"
