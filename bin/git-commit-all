@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+# Commit all changes
+# Usage:
+# $ git-commit-all
+# $ git-commit-all "Commit message"
+set -e
+
+git add --all
+
+if [[ $1 == "" ]]; then
+  git commit -v 
+  return
+fi
+
+git commit -v -m $1
