@@ -7,9 +7,9 @@ set -e
 
 git add --all
 
-if [[ $1 == "" ]]; then
-  git commit -v 
+if [[ $# == 1 ]]; then
+  git commit -v -m $1
   return
 fi
 
-git commit -v -m $1
+git commit -v $*
