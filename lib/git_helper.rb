@@ -166,10 +166,8 @@ module GitHelper
   end
 
   def never_pushed?
-    system('git branch-remote-status')
-    return true if $CHILD_STATUS.exitstatus == 4
-
-    false
+    code = `git branch-remote-status`.strip
+    code == 'never_pushed'
   end
 
   # Pad every cell of a two-dimensionnal array so they are all the same length
