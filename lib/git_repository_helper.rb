@@ -19,7 +19,12 @@ module GitRepositoryHelper
   # Check if the directory is a git repository
   def repository?(directory = nil)
     command = 'git rev-parse'
-    directory = File.expand_path('.') if directory.nil?
+    # expand_path might fail if we're in a directory that was deleted
+    begin
+      directory = File.expand_path('.') if directory.nil?
+    rescue StandardError
+      return false
+    end
 
     # Directory does not exist, so can't be a git one
     return false unless File.exist?(directory)
