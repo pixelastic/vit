@@ -3,6 +3,7 @@ require 'fileutils'
 require 'open3'
 require 'shellwords'
 require_relative './command_helper'
+require_relative './color_helper'
 require_relative './git_argument_helper'
 require_relative './git_branch_helper'
 require_relative './git_commit_helper'
@@ -16,6 +17,7 @@ require_relative './git_tag_helper'
 # Allow access to current git repository state
 module GitHelper
   include CommandHelper
+  include ColorHelper
   include GitArgumentHelper
   include GitBranchHelper
   include GitCommitHelper
@@ -25,54 +27,6 @@ module GitHelper
   include GitRemoteHelper
   include GitRepositoryHelper
   include GitTagHelper
-
-  COLORS = {
-    branch: 202,
-    branch_gone: 160,
-
-    branch_bugfix: 203,
-    branch_develop: 184,
-    branch_gh_pages: 24,
-    branch_heroku: 141,
-    branch_master: 69,
-    branch_release: 171,
-    hash: 67,
-    message: 250,
-    remote: 202,
-    remote_algolia: 67,
-    remote_github: 24,
-    remote_heroku: 141,
-    remote_origin: 184,
-    remote_pixelastic: 69,
-    remote_upstream: 69,
-    tag: 241,
-    url: 250,
-    valid: 35,
-    date: 24,
-    ahead: 34,
-    behind: 203
-  }.freeze
-
-  def color(type)
-    COLORS[type]
-  end
-
-  def branch_color(branch)
-    return COLORS[:branch_gone] if branch_gone?(branch)
-    return nil if branch.nil?
-
-    color_symbol = ('branch_' + branch.tr('-', '_')).to_sym
-    return COLORS[color_symbol] if COLORS[color_symbol]
-
-    COLORS[:branch]
-  end
-
-  def remote_color(remote)
-    color_symbol = ('remote_' + remote).to_sym
-    return COLORS[color_symbol] if COLORS[color_symbol]
-
-    COLORS[:remote]
-  end
 
   # Return only --flags
   def get_flag_args(args)
@@ -114,13 +68,6 @@ module GitHelper
     return ' ' if code == 'local_behind'
     return ' ' if code == 'local_diverged'
     return ' ' if code == 'local_never_pushed'
-  end
-
-  def colorize(text, color)
-    return nil if color.nil?
-
-    color = format('%03d', color)
-    "[38;5;#{color}m#{text}[00m"
   end
 
   def longest_by_type(list, type)
