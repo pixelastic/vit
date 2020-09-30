@@ -4,6 +4,7 @@ require 'open3'
 require 'shellwords'
 require_relative './command_helper'
 require_relative './color_helper'
+require_relative './dependency_helper'
 require_relative './git_argument_helper'
 require_relative './git_branch_helper'
 require_relative './git_commit_helper'
@@ -18,6 +19,7 @@ require_relative './git_tag_helper'
 module GitHelper
   include CommandHelper
   include ColorHelper
+  include DependencyHelper
   include GitArgumentHelper
   include GitBranchHelper
   include GitCommitHelper
@@ -95,21 +97,6 @@ module GitHelper
 
   def branch_gone?(name)
     system("git branch-gone #{name}")
-  end
-
-  # Run npm install if package.json changed since old_commit
-  def npm_install(old_commit)
-    root = repo_root
-    # No need to update if not an npm project
-    return unless File.exist?(File.join(root, 'node_modules'))
-
-    # No need to update if the file did not change
-    command = 'git diff --name-only '\
-      "#{old_commit}..#{current_commit} -- package.json"
-    changed_file = `#{command}`.strip
-    return if changed_file.empty?
-
-    system('yarn')
   end
 
   def never_pushed?

@@ -60,7 +60,7 @@ class GitBranchPull
     else
       pull_unknown_branch
     end
-    npm_install(old_commit)
+    update_dependencies(old_commit)
   end
 end
 GitBranchPull.new(*ARGV).run

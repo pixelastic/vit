@@ -16,7 +16,7 @@ class GitBranchSwitch
   def run
     old_commit = current_commit
     system("git checkout #{@branch_name}")
-    npm_install(old_commit)
+    update_dependencies(old_commit)
   end
 end
 GitBranchSwitch.new(*ARGV).run

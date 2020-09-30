@@ -49,4 +49,11 @@ module GitFileHelper
     command = 'git reset'
     command_success?(command)
   end
+
+  # Has the file changed between two commit
+  def file_changed(start_commit, end_commit, filepath)
+    command = "git diff --name-only '#{start_commit}..#{end_commit}' -- #{filepath}"
+    changed_file = `#{command}`.strip
+    return changed_file.empty?
+  end
 end
