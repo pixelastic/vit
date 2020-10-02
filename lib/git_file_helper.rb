@@ -54,6 +54,6 @@ module GitFileHelper
   def file_changed(start_commit, end_commit, filepath)
     command = "git diff --name-only '#{start_commit}..#{end_commit}' -- #{filepath}"
     changed_file = `#{command}`.strip
-    return changed_file.empty?
+    return !changed_file.empty?
   end
 end

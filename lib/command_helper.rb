@@ -17,4 +17,13 @@ module CommandHelper
     stdout, = Open3.capture3(command)
     stdout.strip
   end
+
+  # Run a command in the background
+  # Will create a lockfile while the process is running
+  def run_in_background(command, lockfile)
+    return if File.exist?(lockfile)
+    full_command = "touch #{lockfile} && #{command} >/dev/null 2>&1; rm #{lockfile}"
+    pid = Process.fork { system full_command }
+    Process.detach(pid)
+  end
 end

@@ -55,11 +55,11 @@ class GitBranchPull
 
   def run
     old_commit = current_commit
-    if branch?(@branch_name)
-      pull_known_branch
-    else
-      pull_unknown_branch
-    end
+    # if branch?(@branch_name)
+    #   pull_known_branch
+    # else
+    #   pull_unknown_branch
+    # end
     update_dependencies(old_commit)
   end
 end
