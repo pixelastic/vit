@@ -16,8 +16,11 @@ class GitBranchPull
     @flags = get_flag_args(args)
     @args = get_real_args(args)
 
-    # Make sure we'll always rebase when pulling
-    @flags << '--rebase'
+    # Don't rebase at work
+    unless repo_root.include? 'doctolib'
+      @flags << '--rebase'
+    end
+
 
     elements = guess_elements(@args)
     @remote_name = elements[:remote]
