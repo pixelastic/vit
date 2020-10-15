@@ -29,7 +29,7 @@ class GitRemotePush
 
     # Pushing to default remote for the first time
     if is_pushing_to_default_remote && never_pushed?
-      @flags << '--set-upstream' if never_pushed?
+      @flags << '--set-upstream'
     end
 
     # Pushing to specific remote

@@ -10,19 +10,21 @@ if [[ "$branchName" = '' ]]; then
   branchName="$(git branch-current)"
 fi
 
+local localHead=$(git rev-parse $branchName@{0} 2>/dev/null)
 local remoteHead=$(git rev-parse $branchName@{upstream} 2>/dev/null)
+
+# Local is same as remote
+if [[ "$remoteHead" = "$localHead" ]]; then
+  echo "local_identical"
+  exit
+fi
+
 # Remote has no hash, means it never get pushed
 if [[ "$remoteHead" = '' ]]; then
   echo "local_never_pushed"
   exit
 fi
 
-local localHead=$(git rev-parse $branchName@{0} 2>/dev/null)
-# Local is same as remote
-if [[ "$remoteHead" = "$localHead" ]]; then
-  echo "local_identical"
-  exit
-fi
 
 local remoteMergeBase=$(git merge-base $branchName@{0} $branchName@{upstream} 2>/dev/null)
 # Merge base is the same as remote, it means we are ahead
