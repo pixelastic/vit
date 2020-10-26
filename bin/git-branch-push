@@ -27,10 +27,8 @@ class GitRemotePush
   def run
     is_pushing_to_default_remote = (@remote_name == current_remote)
 
-    # Pushing to default remote for the first time
-    if is_pushing_to_default_remote && never_pushed?
-      @flags << '--set-upstream'
-    end
+    # Force setting the upstream
+    @flags << '--set-upstream'
 
     # Pushing to specific remote
     @flags << '-u' unless is_pushing_to_default_remote

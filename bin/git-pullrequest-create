@@ -50,12 +50,41 @@ class GitPullRequestCreate
     branch?('develop') ? 'develop' : 'master'
   end
 
-  # Gets the full description (commit messages) since branch creation
   def description
+    "#{pull_request_template}\n\n<!-- #{commit_recap} -->"
+  end
+
+  def pull_request_template
+    return bux_template if bux?
+
+    github_template = "#{repo_root}/.github/PULL_REQUEST_TEMPLATE.md"
+    if File.exists?(github_template)
+      return File.read(github_template)
+    end
+    return ""
+  end
+
+  def bux?
+    current_branch.start_with?('BUX');
+  end
+
+  # Template used at work
+  def bux_template
+    branch_name = current_branch
+
+    return "### :page_with_curl: JIRA
+
+> [#{branch_name}](https://doctolib.atlassian.net/browse/#{branch_name})
+
+### :spiral_notepad: Notes"
+  end
+
+  def commit_recap
     # If the origin is closer than the local version, we use it
     branch_origin = "#{current_remote}/#{@branch}"
     closer_branch = `git-commit-closer #{@branch} #{branch_origin}`.strip
-    `git log --pretty=format:'%b' #{closer_branch}...`.strip
+    command = "git log --pretty='format:%s\n%b' #{closer_branch}..."
+    `#{command}`.strip
   end
 
   def set_upstream
@@ -64,12 +93,16 @@ class GitPullRequestCreate
     `#{command}`
   end
 
+  # Add BUX as reviewer if bux
+  # Mark as draft by default?
+
   def run
     # Then create the PR
     options = [
+      "--title #{current_branch}",
       "--submit #{@owner}",
       "--branch #{@branch}",
-      "--description #{description.shellescape}"
+      "--description #{description.shellescape}",
     ]
     command = "gh pr #{options.join(' ')}"
     `#{command}`
