@@ -29,8 +29,8 @@ class BranchListRemote
   def difference(branch_name)
     difference = branch_difference('master', branch_name)
     
-    ahead = difference[:ahead] > 0 ? "  #{difference[:ahead]} ahead" : ""
-    behind = difference[:behind] > 0 ? "  #{difference[:behind]} behind" : ""
+    ahead = difference[:ahead] > 0 ? "  #{difference[:ahead]} ahead" : ""
+    behind = difference[:behind] > 0 ? "  #{difference[:behind]} behind" : ""
 
     return [
       colorize(ahead.ljust(15), color(:ahead)),
