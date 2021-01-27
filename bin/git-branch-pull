@@ -15,11 +15,8 @@ class GitBranchPull
   def initialize(*args)
     @flags = get_flag_args(args)
     @args = get_real_args(args)
-    force_rebase = @flags.include?('--rebase')
 
     @flags << '--rebase' 
-    @flags.delete('--rebase') if repo_root.include? 'doctolib'
-    @flags << '--rebase' if force_rebase
 
     elements = guess_elements(@args)
     @remote_name = elements[:remote]
