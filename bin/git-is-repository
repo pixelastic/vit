@@ -1,19 +1,4 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Check if current directory is a git repository
 
-# Checks if the specified directory is a git repository
-# Usage:
-#   $ git is-repository 
-#   $ git is-repository ./filepath
-class GitIsRepository
-  include GitHelper
-  def initialize(*args)
-    @target = args[0]
-  end
-
-  def run
-    exit 1 unless repository?(@target)
-    exit 0
-  end
-end
-GitIsRepository.new(*ARGV).run
+git rev-parse --is-inside-work-tree &>/dev/null
