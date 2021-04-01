@@ -27,7 +27,7 @@ class GitRemoteList
   end
 
   def output_current_remote(remote)
-    return colorize('', color(:valid)) if @current_remote == remote
+    return colorize('', color(:valid)) if @current_remote == remote
     ' '
   end
 
