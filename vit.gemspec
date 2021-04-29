@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   # Dependencies
   gem.add_development_dependency 'flay', '~> 2.6'
   gem.add_development_dependency 'flog', '~> 4.3'
+  gem.add_development_dependency 'guard', '~> 2.16'
   gem.add_development_dependency 'guard-rspec', '~> 4.6'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'rubocop', '~> 0.51'
