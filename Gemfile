@@ -3,4 +3,4 @@ source 'https://rubygems.org'
 # Dependencies are defined in the .gemspec file
 gemspec
 
-gem "rake", "~> 12.3"
+gem "rake", "~> 13.0"

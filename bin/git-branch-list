@@ -78,6 +78,7 @@ class GitBranchListAll
     current_remote = current_remote()
     branches = []
     output.each_line do |line|
+      p line
       raw_branch_name, hash, message = line.match(/^.{2}(.*) ([a-f0-9]{7}) (.*)$/).captures
       local_name = raw_branch_name.strip
       # If nothing is specified, it points to current remote and on a branch

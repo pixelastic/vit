@@ -95,4 +95,8 @@ describe(GitBranchHelper) do
       expect(actual).to eq false
     end
   end
+
+  describe 'parse_raw' do
+
+  end
 end

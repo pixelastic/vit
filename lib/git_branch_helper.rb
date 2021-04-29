@@ -40,4 +40,25 @@ module GitBranchHelper
     command = "git show --pretty=format:'%cr' #{branch_name} | head -1"
     command_stdout(command)
   end
+
+  def parse_raw(input)
+    # Takes an input as a line returned but git branch -vv and returns a hash
+    
+    # * master c7c506bd [origin/master: ahead 1] chore(private): Update private submodule
+    # 1-2 chars at start, * if current
+    # Then the name. Can be (HEAD detached from hash)
+    # An optional [origin/master: ahead 1] part if different from remote
+    # Then the commit message
+    #
+    # Should return a hash with
+    # local_name
+    # remote
+    # distant_name
+    # hash
+    # is_gone
+    # message
+
+
+
+  end
 end

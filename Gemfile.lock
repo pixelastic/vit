@@ -57,7 +57,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     rainbow (3.0.0)
-    rake (12.3.1)
+    rake (13.0.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -105,7 +105,7 @@ DEPENDENCIES
   flay (~> 2.6)
   flog (~> 4.3)
   guard-rspec (~> 4.6)
-  rake (~> 12.3)
+  rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 0.51)
   rubocop-rspec-focused (~> 0.1.0)
@@ -113,4 +113,4 @@ DEPENDENCIES
   vit!
 
 BUNDLED WITH
-   1.16.5
+   2.1.4
