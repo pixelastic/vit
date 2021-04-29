@@ -78,11 +78,18 @@ class GitBranchListAll
     current_remote = current_remote()
     branches = []
     output.each_line do |line|
-      local_name, hash, message = line.match(/^.{2}([^ ]*) *([^ ]*) (.*)$/).captures
+      raw_branch_name, hash, message = line.match(/^.{2}(.*) ([a-f0-9]{7}) (.*)$/).captures
+      local_name = raw_branch_name.strip
       # If nothing is specified, it points to current remote and on a branch
       # with the same name
       distant_name = local_name
       remote = current_remote
+
+      # Current branch is detached
+      if local_name[0] == '('
+        local_name = 'HEAD'
+        distant_name = 'HEAD'
+      end
 
       # message contains distant branch and ahead/behind/gone information
       if message[0] == '['
