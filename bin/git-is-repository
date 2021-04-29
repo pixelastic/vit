@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
 # Check if current directory is a git repository
 
-git rev-parse --is-inside-work-tree &>/dev/null
+local response="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+
+[[ "$response" == "true" ]] && exit 0
+exit 1
