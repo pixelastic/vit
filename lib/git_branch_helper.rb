@@ -45,13 +45,15 @@ module GitBranchHelper
   def parse_raw_branch(input)
     # Splitting the regexp in more manageable parts
     regexp_prefix = /(?<prefix> |\*)/
-    regexp_branch = /(?<branch>[^ ]*)/
     regexp_hash = /(?<hash>[a-f0-9]*{8})/
+    regexp_branch = /(?<branch>[^ ]*)/
+    regexp_optional_detached = /(?<optional_detached>\(HEAD detached at #{regexp_hash}\))?/
     regexp_remote_info = /(?<remote_info>\[.*\])?/
     regexp_message = /(?<message>.*)/
 
     regexp_array = [
       "^#{regexp_prefix} ",
+      regexp_optional_detached,
       "#{regexp_branch} *",
       "#{regexp_hash} ",
       "#{regexp_remote_info} ?",
@@ -62,6 +64,7 @@ module GitBranchHelper
     regexp = /#{regexp_array.join('')}/
     matches = input.match(regexp)
     prefix = matches[:prefix]
+    optional_detached = matches[:optional_detached]
     branch = matches[:branch]
     hash = matches[:hash]
     remote_info = matches[:remote_info]
@@ -75,11 +78,15 @@ module GitBranchHelper
     remote_name = current_remote
     remote_difference = 0
     remote_is_gone = false
+    #
+    # Detached head
+    unless optional_detached.nil?
+      branch_name_locally = 'HEAD'
+      branch_name_remotely = nil
+    end
 
     # Remote info
     unless remote_info.nil?
-      # TODO: Should parse [origin/master: ahead 2], or [origin/master: behind
-      # 3]
       remote_regexp_array = [
         /^\[/,
         %r{(?<remote_name>.*)/(?<branch_name>[^:]*)},
@@ -93,14 +100,15 @@ module GitBranchHelper
       remote_name = remote_matches[:remote_name]
       branch_name_remotely = remote_matches[:branch_name]
 
-
       difference_type = remote_matches[:difference_type]
       difference_index = remote_matches[:difference_index]
       difference_gone = remote_matches[:difference_gone]
 
       unless difference_type.nil?
         remote_difference = difference_index.to_i if difference_type == 'ahead'
-        remote_difference = "-#{difference_index}".to_i if difference_type == 'behind'
+        if difference_type == 'behind'
+          remote_difference = "-#{difference_index}".to_i
+        end
       end
 
       remote_is_gone = true unless difference_gone.nil?

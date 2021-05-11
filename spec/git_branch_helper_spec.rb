@@ -96,7 +96,7 @@ describe(GitBranchHelper) do
     end
   end
 
-  fdescribe 'parse_raw_branch' do
+  describe 'parse_raw_branch' do
     items = [
       {
         input: '  master abcdef01 feat(stuff): Add stuff',
@@ -135,7 +135,8 @@ describe(GitBranchHelper) do
         }
       },
       {
-        input: '  master 0e87d60 [origin/master: ahead 2] feat(stuff): Add stuff',
+        input:
+          '  master 0e87d60 [origin/master: ahead 2] feat(stuff): Add stuff',
         expected: {
           remote_name: 'origin',
           remote_branch_name: 'master',
@@ -149,6 +150,14 @@ describe(GitBranchHelper) do
           remote_branch_name: 'new-branch',
           remote_difference: 0,
           remote_gone?: true
+        }
+      },
+      {
+        input: '* (HEAD detached at 0e87d60) 0e87d60 v2.10.0',
+        expected: {
+          hash: '0e87d60',
+          message: 'v2.10.0',
+          name: 'HEAD'
         }
       }
     ]
