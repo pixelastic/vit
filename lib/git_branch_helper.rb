@@ -78,7 +78,7 @@ module GitBranchHelper
     remote_name = current_remote
     remote_difference = 0
     remote_is_gone = false
-    #
+    
     # Detached head
     unless optional_detached.nil?
       branch_name_locally = 'HEAD'
@@ -118,21 +118,14 @@ module GitBranchHelper
     {
       raw: input,
       hash: hash,
-      current?: branch_is_current,
+      is_current: branch_is_current,
       name: branch_name_locally,
       message: message,
 
       remote_name: remote_name,
       remote_branch_name: branch_name_remotely,
       remote_difference: remote_difference,
-      remote_gone?: remote_is_gone
+      remote_is_gone: remote_is_gone
     }
-    # Takes an input as a line returned but git branch -vv and returns a hash
-
-    # * master c7c506bd [origin/master: ahead 1] chore(private): Update private submodule
-    # 1-2 chars at start, * if current
-    # Then the name. Can be (HEAD detached from hash)
-    # An optional [origin/master: ahead 1] part if different from remote
-    # Then the commit message
   end
 end

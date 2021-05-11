@@ -7,47 +7,39 @@ class Branch
   include GitHelper
   def initialize(data)
     @hash = data[:hash]
-    @local_name = data[:local_name]
+    @is_current = data[:is_current]
+    @name = data[:name]
     @message = data[:message]
-    @is_gone = data[:is_gone] || false
-    @is_current = data[:is_current] || false
-
-    @position = parse_position(data[:position])
-    @remote = data[:remote]
-    @distant_name = data[:distant_name]
+    @remote_name = data[:remote_name]
+    @remote_branch_name = data[:remote_branch_name]
+    @remote_difference = data[:remote_difference]
+    @remote_is_gone = data[:remote_is_gone]
 
     data = commit_info(@hash)
     @date = data[:date]
     @date_relative = data[:date_relative]
   end
 
-  def parse_position(position)
-    return nil if position.nila
-
-    position.gsub('ahead ', '+').gsub('behind ', '-').to_i
-  end
-
   def data_as_array
     display = []
     # Mark current branch
-    display << @is_current ? '' : ' '
+    display << (@is_current ? '' : ' ')
 
     # Marker
     display << push_pull_indicator(@local_name)
 
-    has_different_remote = @local_name != @distant_name
-    display << has_different_remote ? "#{@local_name}:#{@distant_name}" : @local_name
+    has_different_remote = (!@remote_branch_name.nil? && @remote_branch_name != @name)
+    display_name = (has_different_remote ? "#{@name}:#{@remote_branch_name}" : @name)
+    display << display_name
 
     display << @hash
 
-    if Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
-      display << " #{@date_relative}"
+    is_old = Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
+    display_time = " #{@date_relative}"
                  .gsub('weeks', 'w.')
                  .gsub('days', 'd.')
                  .gsub(' ago', '')
-    else
-      display << nil
-    end
+    display << (is_old ? display_time : nil)
 
     display << @message
 
@@ -69,22 +61,14 @@ class GitBranchListAll
     branches = []
     output.each_line do |line|
       branch_data = parse_raw_branch(line)
-      ap branch_data
-      # branches << Branch.new(branch_data)
-      
-      # # Current branch is detached
-      # if local_name[0] == '('
-      #   local_name = 'HEAD'
-      #   distant_name = 'HEAD'
-      # end
-
+      branches << Branch.new(branch_data)
     end
     branches
   end
 
   def run
-    return
-    lines = pad_two_dimensionnal_array(@branches.map(&:data_as_array))
+    branches_as_array = @branches.map(&:data_as_array)
+    lines = pad_two_dimensionnal_array(branches_as_array)
 
     # Colorize output
     output = lines.map do |line|

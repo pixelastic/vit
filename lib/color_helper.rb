@@ -1,8 +1,8 @@
 # Access colors by color name or linked named
 module ColorHelper
   # Create an array of named colors
-  orderedcolors=%w{gray red green yellow blue purple teal orange indigo pink}
-  colors={}
+  orderedcolors = %w[gray red green yellow blue purple teal orange indigo pink]
+  colors = {}
   orderedcolors.each_with_index do |color_prefix_name, color_prefix_index|
     10.times do |color_index|
       color_name = "#{color_prefix_name}#{color_index}"
@@ -12,29 +12,31 @@ module ColorHelper
     colors[color_prefix_name] = colors["#{color_prefix_name}6"]
   end
 
-  COLORS = colors.merge({
-    branch: colors["orange"],
-    branch_gone: colors["gray"],
-    branch_develop: colors["yellow"],
-    branch_master: colors["blue"],
-    hash: colors["indigo"],
-    message: colors["gray"],
-    remote: colors["yellow"],
-    remote_origin: colors["orange"],
-    remote_pixelastic: colors["green"],
-    remote_upstream: colors["blue"],
-    tag: colors["gray"],
-    valid: colors["green"],
-    date: colors["blue"],
-    ahead: colors["green"],
-    behind: colors["red"]
-  }).freeze
+  COLORS = colors.merge(
+    branch: colors['orange'],
+    branch_head: colors['red'],
+    branch_gone: colors['gray'],
+    branch_develop: colors['yellow'],
+    branch_master: colors['blue'],
+    hash: colors['indigo'],
+    message: colors['gray'],
+    remote: colors['yellow'],
+    remote_origin: colors['orange'],
+    remote_pixelastic: colors['green'],
+    remote_upstream: colors['blue'],
+    tag: colors['gray'],
+    valid: colors['green'],
+    date: colors['blue'],
+    ahead: colors['green'],
+    behind: colors['red']
+  ).freeze
 
   def color(target)
     COLORS[target]
   end
 
   def branch_color(branch)
+    return COLORS[:branch_head] if branch == 'HEAD'
     return COLORS[:branch_gone] if branch_gone?(branch)
     return nil if branch.nil?
 
@@ -57,5 +59,4 @@ module ColorHelper
     color = format('%03d', color)
     "[38;5;#{color}m#{text}[00m"
   end
-
 end
