@@ -96,7 +96,75 @@ describe(GitBranchHelper) do
     end
   end
 
-  describe 'parse_raw' do
+  fdescribe 'parse_raw_branch' do
+    items = [
+      {
+        input: '  master abcdef01 feat(stuff): Add stuff',
+        expected: {
+          current?: false,
+          hash: 'abcdef01',
+          message: 'feat(stuff): Add stuff',
+          name: 'master',
+          remote_branch_name: 'master',
+          remote_difference: 0,
+          remote_gone?: false,
+          remote_name: 'origin'
+        }
+      },
+      {
+        input: '* master abcdef01 feat(stuff): Add stuff',
+        expected: {
+          current?: true
+        }
+      },
+      {
+        input: '* foo        abcdef01 some stuff',
+        expected: {
+          hash: 'abcdef01',
+          name: 'foo'
+        }
+      },
+      {
+        input: '  master 0e87d60 [origin/master] v2.10.0',
+        expected: {
+          message: 'v2.10.0',
+          remote_name: 'origin',
+          remote_branch_name: 'master',
+          remote_difference: 0,
+          remote_gone?: false
+        }
+      },
+      {
+        input: '  master 0e87d60 [origin/master: ahead 2] feat(stuff): Add stuff',
+        expected: {
+          remote_name: 'origin',
+          remote_branch_name: 'master',
+          remote_difference: 2
+        }
+      },
+      {
+        input: '* new-branch 0e87d60 [origin/new-branch: gone] v2.10.0',
+        expected: {
+          remote_name: 'origin',
+          remote_branch_name: 'new-branch',
+          remote_difference: 0,
+          remote_gone?: true
+        }
+      }
+    ]
 
+    items.each do |item|
+      it item[:input] do
+        actual = test_instance.parse_raw_branch(item[:input])
+        expected = item[:expected]
+
+        expected.each do |key, value|
+          expect(actual[key]).to(
+            eq(value),
+            "#{key}:\nActual:     #{actual[key]}\nExpected:   #{value}"
+          )
+        end
+      end
+    end
   end
 end

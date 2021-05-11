@@ -14,10 +14,12 @@ Gem::Specification.new do |gem|
   gem.licenses = ['MIT']
 
   # Dependencies
+  gem.add_development_dependency 'awesome_print', '~> 1.9'
   gem.add_development_dependency 'flay', '~> 2.6'
   gem.add_development_dependency 'flog', '~> 4.3'
   gem.add_development_dependency 'guard', '~> 2.16'
   gem.add_development_dependency 'guard-rspec', '~> 4.6'
+  gem.add_development_dependency 'rake', '~> 13.0'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'rubocop', '~> 0.51'
   gem.add_development_dependency 'rubocop-rspec-focused', '~> 0.1.0'

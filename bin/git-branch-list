@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require_relative '../lib/git_helper'
+require 'awesome_print'
 
 # Branch representation
 class Branch
@@ -9,6 +10,7 @@ class Branch
     @local_name = data[:local_name]
     @message = data[:message]
     @is_gone = data[:is_gone] || false
+    @is_current = data[:is_current] || false
 
     @position = parse_position(data[:position])
     @remote = data[:remote]
@@ -20,32 +22,21 @@ class Branch
   end
 
   def parse_position(position)
-    return nil if position.nil?
-    position.gsub('ahead ', '+').gsub('behind ', '-').to_i
-  end
+    return nil if position.nila
 
-  def current?
-    current_branch == @local_name
+    position.gsub('ahead ', '+').gsub('behind ', '-').to_i
   end
 
   def data_as_array
     display = []
     # Mark current branch
-    if current?
-      display << ''
-    else
-      display << ' '
-    end
-
+    display << @is_current ? '' : ' '
 
     # Marker
     display << push_pull_indicator(@local_name)
 
-    if @local_name == @distant_name
-      display << @local_name
-    else
-      display << "#{@local_name}:#{@distant_name}"
-    end
+    has_different_remote = @local_name != @distant_name
+    display << has_different_remote ? "#{@local_name}:#{@distant_name}" : @local_name
 
     display << @hash
 
@@ -75,46 +66,24 @@ class GitBranchListAll
 
   def branches
     output = `git branch -vv`
-    current_remote = current_remote()
     branches = []
     output.each_line do |line|
-      p line
-      raw_branch_name, hash, message = line.match(/^.{2}(.*) ([a-f0-9]{7}) (.*)$/).captures
-      local_name = raw_branch_name.strip
-      # If nothing is specified, it points to current remote and on a branch
-      # with the same name
-      distant_name = local_name
-      remote = current_remote
+      branch_data = parse_raw_branch(line)
+      ap branch_data
+      # branches << Branch.new(branch_data)
+      
+      # # Current branch is detached
+      # if local_name[0] == '('
+      #   local_name = 'HEAD'
+      #   distant_name = 'HEAD'
+      # end
 
-      # Current branch is detached
-      if local_name[0] == '('
-        local_name = 'HEAD'
-        distant_name = 'HEAD'
-      end
-
-      # message contains distant branch and ahead/behind/gone information
-      if message[0] == '['
-        distant_name, _, position, message = message.match(/^\[([^ :]*)(: )?(.*)\] (.*)/).captures
-        is_branch_gone = (position == 'gone')
-        split = distant_name.split('/')
-        remote = split.shift
-        distant_name = split.join('/').delete(']')
-      end
-
-      branches << Branch.new(
-        local_name: local_name,
-        distant_name: distant_name,
-        remote: remote,
-        is_gone: is_branch_gone,
-        hash: hash,
-        position: position,
-        message: message
-      )
     end
     branches
   end
 
   def run
+    return
     lines = pad_two_dimensionnal_array(@branches.map(&:data_as_array))
 
     # Colorize output
