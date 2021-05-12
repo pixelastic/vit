@@ -1,5 +1,4 @@
 require_relative './command_helper'
-require 'awesome_print'
 
 # Branch-related methods
 module GitBranchHelper
