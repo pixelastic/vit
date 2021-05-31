@@ -101,20 +101,20 @@ describe(GitBranchHelper) do
       {
         input: '  master abcdef01 feat(stuff): Add stuff',
         expected: {
-          current?: false,
+          is_current: false,
           hash: 'abcdef01',
           message: 'feat(stuff): Add stuff',
           name: 'master',
           remote_branch_name: 'master',
           remote_difference: 0,
-          remote_gone?: false,
+          remote_is_gone: false,
           remote_name: 'origin'
         }
       },
       {
         input: '* master abcdef01 feat(stuff): Add stuff',
         expected: {
-          current?: true
+          is_current: true
         }
       },
       {
@@ -131,7 +131,7 @@ describe(GitBranchHelper) do
           remote_name: 'origin',
           remote_branch_name: 'master',
           remote_difference: 0,
-          remote_gone?: false
+          remote_is_gone: false
         }
       },
       {
@@ -149,7 +149,7 @@ describe(GitBranchHelper) do
           remote_name: 'origin',
           remote_branch_name: 'new-branch',
           remote_difference: 0,
-          remote_gone?: true
+          remote_is_gone: true
         }
       },
       {
@@ -161,7 +161,6 @@ describe(GitBranchHelper) do
         }
       }
     ]
-
     items.each do |item|
       it item[:input] do
         actual = test_instance.parse_raw_branch(item[:input])
@@ -175,5 +174,23 @@ describe(GitBranchHelper) do
         end
       end
     end
+
+    # items.each do |item|
+    #   describe item[:input] do
+    #     expected = item[:expected]
+
+    #     expected.each do |key, value|
+    #       it "#{key}" do
+    #         p key
+    #         p value
+
+    #       end
+    #       # expect(actual[key]).to(
+    #       #   eq(value),
+    #       #   "#{key}:\nActual:     #{actual[key]}\nExpected:   #{value}"
+    #       # )
+    #     end
+    #   end
+    # end
   end
 end
