@@ -96,7 +96,7 @@ describe(GitBranchHelper) do
     end
   end
 
-  describe 'parse_raw_branch' do
+  fdescribe 'parse_raw_branch' do
     items = [
       {
         input: '  master abcdef01 feat(stuff): Add stuff',
@@ -106,7 +106,8 @@ describe(GitBranchHelper) do
           message: 'feat(stuff): Add stuff',
           name: 'master',
           remote_branch_name: 'master',
-          remote_difference: 0,
+          remote_ahead: nil,
+          remote_behind: nil,
           remote_is_gone: false,
           remote_name: 'origin'
         }
@@ -130,7 +131,8 @@ describe(GitBranchHelper) do
           message: 'v2.10.0',
           remote_name: 'origin',
           remote_branch_name: 'master',
-          remote_difference: 0,
+          remote_ahead: nil,
+          remote_behind: nil,
           remote_is_gone: false
         }
       },
@@ -140,7 +142,9 @@ describe(GitBranchHelper) do
         expected: {
           remote_name: 'origin',
           remote_branch_name: 'master',
-          remote_difference: 2
+          remote_ahead: '2',
+          remote_behind: nil,
+          remote_is_gone: false
         }
       },
       {
@@ -148,7 +152,8 @@ describe(GitBranchHelper) do
         expected: {
           remote_name: 'origin',
           remote_branch_name: 'new-branch',
-          remote_difference: 0,
+          remote_ahead: nil,
+          remote_behind: nil,
           remote_is_gone: true
         }
       },
@@ -159,7 +164,18 @@ describe(GitBranchHelper) do
           message: 'v2.10.0',
           name: 'HEAD'
         }
+      },
+      {
+        input: '* master     88f671d [ahead 1, behind 5] fix(jest): Remove stuff',
+        expected: {
+          hash: '88f671d',
+          remote_ahead: '1',
+          remote_behind: '5',
+          remote_name: 'origin',
+          remote_branch_name: 'master'
+        }
       }
+
     ]
     items.each do |item|
       it item[:input] do

@@ -75,9 +75,8 @@ module GitBranchHelper
     # Default values
     branch_name_remotely = branch_name_locally
     remote_name = current_remote
-    remote_difference = 0
     remote_is_gone = false
-    
+
     # Detached head
     unless optional_detached.nil?
       branch_name_locally = 'HEAD'
@@ -86,32 +85,34 @@ module GitBranchHelper
 
     # Remote info
     unless remote_info.nil?
+      # Potential values
+      # [origin/master]
+      # [origin/master: ahead 2]
+      # [origin/new-branch: gone]
+      # [ahead 1, behind 5]
       remote_regexp_array = [
         /^\[/,
-        %r{(?<remote_name>.*)/(?<branch_name>[^:]*)},
-        /(: (?<difference_type>ahead|behind) (?<difference_index>[0-9]*))?/,
-        /(: (?<difference_gone>gone))?/,
+        # Remote origin/name
+        %r{((?<remote_name>.*)/(?<branch_name>[^:]*))?},
+        /(: )?/,
+        # ahead
+        /(ahead (?<remote_ahead>[0-9]*))?/,
+        /(, )?/,
+        # behind
+        /(behind (?<remote_behind>[0-9]*))?/,
+        # gone
+        /(: (?<remote_gone>gone))?/,
         /\]$/
       ]
       remote_regexp = /#{remote_regexp_array.join('')}/
       remote_matches = remote_info.match(remote_regexp)
 
-      remote_name = remote_matches[:remote_name]
-      branch_name_remotely = remote_matches[:branch_name]
+      remote_name = remote_matches[:remote_name] || remote_name
+      branch_name_remotely = remote_matches[:branch_name] || branch_name_remotely
 
-      difference_type = remote_matches[:difference_type]
-      difference_index = remote_matches[:difference_index]
-      difference_gone = remote_matches[:difference_gone]
-
-      unless difference_type.nil?
-        remote_difference = difference_index.to_i if difference_type == 'ahead'
-        if difference_type == 'behind'
-          remote_difference = "-#{difference_index}".to_i
-        end
-      end
-
-      remote_is_gone = true unless difference_gone.nil?
-
+      remote_ahead = remote_matches[:remote_ahead]
+      remote_behind = remote_matches[:remote_behind]
+      remote_is_gone = true unless remote_matches[:remote_gone].nil?
     end
 
     {
@@ -123,7 +124,8 @@ module GitBranchHelper
 
       remote_name: remote_name,
       remote_branch_name: branch_name_remotely,
-      remote_difference: remote_difference,
+      remote_ahead: remote_ahead,
+      remote_behind: remote_behind,
       remote_is_gone: remote_is_gone
     }
   end

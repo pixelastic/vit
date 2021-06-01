@@ -12,7 +12,8 @@ class Branch
     @message = data[:message]
     @remote_name = data[:remote_name]
     @remote_branch_name = data[:remote_branch_name]
-    @remote_difference = data[:remote_difference]
+    @remote_ahead = data[:remote_ahead]
+    @remote_behind = data[:remote_behind]
     @remote_is_gone = data[:remote_is_gone]
 
     data = commit_info(@hash)
@@ -34,12 +35,16 @@ class Branch
 
     display << @hash
 
+    display << (@remote_behind ? "-#{@remote_behind}" : nil)
+    display << (@remote_ahead ? "+#{@remote_ahead}" : nil)
+
     is_old = Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
     display_time = " #{@date_relative}"
                  .gsub('weeks', 'w.')
                  .gsub('days', 'd.')
                  .gsub(' ago', '')
     display << (is_old ? display_time : nil)
+
 
     display << @message
 
@@ -81,10 +86,14 @@ class GitBranchListAll
       line[2] = colorize(line[2], branch_color(branch_name.strip))
       # hash
       line[3] = colorize(line[3], color(:hash))
+      # behind
+      line[4] = colorize(line[4], color(:behind))
+      # ahead
+      line[5] = colorize(line[5], color(:ahead))
       # date
-      line[4] = colorize(line[4], color(:date))
+      line[6] = colorize(line[6], color(:date))
       # message
-      line[5] = colorize(line[5], color(:message))
+      line[7] = colorize(line[7], color(:message))
       line.join(' ')
     end
     puts output
