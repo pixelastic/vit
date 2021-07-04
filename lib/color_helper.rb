@@ -27,7 +27,7 @@ module ColorHelper
     tag: colors['gray'],
     valid: colors['green'],
     date: colors['blue'],
-    ahead: colors['yellow'],
+    ahead: colors['green'],
     behind: colors['red']
   ).freeze
 
