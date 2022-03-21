@@ -55,28 +55,10 @@ class GitPullRequestCreate
   end
 
   def pull_request_template
-    return bux_template if bux?
-
     github_template = "#{repo_root}/.github/PULL_REQUEST_TEMPLATE.md"
-    if File.exists?(github_template)
-      return File.read(github_template)
-    end
-    return ""
-  end
+    return File.read(github_template) if File.exist?(github_template)
 
-  def bux?
-    current_branch.start_with?('BUX');
-  end
-
-  # Template used at work
-  def bux_template
-    branch_name = current_branch
-
-    return "### :page_with_curl: JIRA
-
-> [#{branch_name}](https://doctolib.atlassian.net/browse/#{branch_name})
-
-### :spiral_notepad: Notes"
+    ''
   end
 
   def commit_recap
@@ -93,16 +75,13 @@ class GitPullRequestCreate
     `#{command}`
   end
 
-  # Add BUX as reviewer if bux
-  # Mark as draft by default?
-
   def run
     # Then create the PR
     options = [
       "--title #{current_branch}",
       "--submit #{@owner}",
       "--branch #{@branch}",
-      "--description #{description.shellescape}",
+      "--description #{description.shellescape}"
     ]
     command = "gh pr #{options.join(' ')}"
     `#{command}`
