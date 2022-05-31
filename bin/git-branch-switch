@@ -1,21 +1,30 @@
 #!/usr/bin/env ruby
 require_relative '../lib/git_helper'
-# Wrapper for switching to another branch
+# Wrapper for switching to another branch. 
+# If the branch does not exist, try the next in the list
 #
 # Usage :
 # $ git-branch-switch master
+# $ git-branch-switch master main
 # $ git-branch-switch m
 class GitBranchSwitch
   include GitHelper
 
   def initialize(*args)
     args = replace_short_aliases(args)
-    @branch_name = args[0]
+    @branches = args
   end
 
   def run
     old_commit = current_commit
-    system("git checkout #{@branch_name}")
+
+    # Keep only the first existing branch
+    branch_name = @branches.find { |branch| branch?(branch) }
+
+    exit 1 if branch_name.empty?
+
+    system("git checkout #{branch_name}")
+
     update_dependencies(old_commit)
   end
 end
