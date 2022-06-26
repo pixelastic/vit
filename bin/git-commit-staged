@@ -7,4 +7,11 @@ set -e
 
 local commitMessage=$1
 
-git commit -v -m $commitMessage
+# Message is passed
+if [[ "$commitMessage" != "" ]]; then
+  git commit -v -m $commitMessage
+  return
+fi
+
+# No message, we open the editor
+git commit -v $*
