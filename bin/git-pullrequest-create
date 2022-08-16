@@ -83,6 +83,7 @@ class GitPullRequestCreate
       "--branch #{@branch}",
       "--description #{description.shellescape}"
     ]
+    # TODO: gh is deprecated, I should use the official GitHub SDK instead
     command = "gh pr #{options.join(' ')}"
     `#{command}`
 

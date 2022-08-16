@@ -95,6 +95,8 @@ class GitDirectoryCreate
     gh_options << '--organization algolia' if @remote_type == :algolia
     gh_options << '--user pixelastic' if @remote_type == :github
     gh_options << '--type private' if @is_private
+    # TODO: gh is deprecated, I should move that to using the official GitHub
+    # SDK
     command = "gh repo #{gh_options.join(' ')}"
 
     if command_success?(command)
