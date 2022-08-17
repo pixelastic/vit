@@ -85,10 +85,11 @@ class GitPullRequestCreate
     ]
     # TODO: gh is deprecated, I should use the official GitHub SDK instead
     command = "gh pr #{options.join(' ')}"
-    `#{command}`
+    # `#{command}`
+    puts "This script is currently broken. The underlying call to gh should now use https://cli.github.com/manual/gh_pr_create"
 
     # Set the upstream, so we know this is pushed
-    set_upstream
+    # set_upstream
   end
 end
 GitPullRequestCreate.new(*ARGV).run
