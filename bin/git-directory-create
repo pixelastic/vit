@@ -9,8 +9,9 @@ require_relative '../lib/git_helper'
 # $ git-directory-create url@to:repo.git ./path/to/repo
 # Options:
 #   By default it will create a repo on GitHub and set it as the remote
-#  -n : Do not add any remote
+#  -n : Only create a local repo
 #  -b : Set the remote to BitBucket
+#  -a : Set the repo on the Algolia username
 #  -p : Set the repo as private (GitHub only)
 class GitDirectoryCreate
   include GitHelper
@@ -31,6 +32,8 @@ class GitDirectoryCreate
     @remote_type = :github
     @remote_type = :bitbucket if elements[:arguments].include?('-b')
     @remote_type = :none if elements[:arguments].include?('-n')
+
+    @is_algolia = elements[:arguments].include?('-a')
 
     # Set private
     @is_private = elements[:arguments].include?('-p')
@@ -91,7 +94,7 @@ class GitDirectoryCreate
     gh_options = [
       @name,
     ]
-    gh_options << '--team algolia' if @remote_type == :algolia
+    gh_options << '--team algolia' if @is_algolia
 
     if @is_private
       gh_options << '--private'
@@ -100,7 +103,6 @@ class GitDirectoryCreate
     end
 
     command = "gh repo create #{gh_options.join(' ')}"
-    puts command
 
     if command_success?(command)
       puts '✔ Creating GitHub repository'
