@@ -1,14 +1,4 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Display name of current remote
 
-# Returns the name of the current remote
-# Usage:
-#   $ git remote-current
-class GitRemoteCurrent
-  include GitHelper
-
-  def run
-    puts current_remote
-  end
-end
-GitRemoteCurrent.new.run
+git remote
