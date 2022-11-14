@@ -1,14 +1,4 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Display name of current branch
 
-# Returns the name of the current branch
-# Usage:
-#   $ git branch-current
-class GitBranchCurrent
-  include GitHelper
-
-  def run
-    puts current_branch
-  end
-end
-GitBranchCurrent.new.run
+git rev-parse --abbrev-ref HEAD

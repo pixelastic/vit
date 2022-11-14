@@ -1,14 +1,5 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Display name of current tag
 
-# Returns the name of the current tag
-# Usage:
-#   $ git tag-current
-class GitTagCurrent
-  include GitHelper
-
-  def run
-    puts current_tag
-  end
-end
-GitTagCurrent.new.run
+git describe --tags --abbrev=0 2>/dev/null
+exit 0
