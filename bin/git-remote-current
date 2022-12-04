@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
 # Display name of current remote
+local currentBranch="$(git branch-current)"
 
-git remote
+git config "branch.${currentBranch}.remote"
