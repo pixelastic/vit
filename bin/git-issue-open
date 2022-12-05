@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+# Opens issues in the browser
+local issueNumber=$1
+local openedUrl="$(git directory-url)"
+
+# Open a specific issue or the full list
+if [[ $issueNumber != "" ]]; then
+  openedUrl="${openedUrl}/issues/${issueNumber}"
+else
+  openedUrl="${openedUrl}/issues/"
+fi
+
+$BROWSER $openedUrl &>/dev/null
+

@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# Create a new issue
+gh issue create
