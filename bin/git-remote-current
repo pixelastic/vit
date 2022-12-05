@@ -1,5 +1,15 @@
 #!/usr/bin/env zsh
 # Display name of current remote
-local currentBranch="$(git branch-current)"
 
-git config "branch.${currentBranch}.remote"
+# Read the origin from the current branch config
+local currentBranch="$(git-branch-current)"
+local currentRemote="$(git config "branch.${currentBranch}.remote")"
+if [[ $currentRemote != "" ]]; then
+  echo $currentRemote
+  exit 0
+fi
+
+# If the branch has never been pushed, there is no remote configured, so we'll
+# assume it's "origin"
+echo "origin"
+
