@@ -1,37 +1,24 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Squash all commit of current branch into one
+#!/usr/bin/env zsh
+set -e
+# Squash all commit of the current branch together
 # Usage :
+# $ git-branch-squash
 # $ git-branch-squash develop
-# $ git-branch-switch d
-class GitBranchSquash
-  include GitHelper
 
-  def initialize(*args)
-    args = replace_short_aliases(args)
-    @starting_point = starting_point(args[0])
-    if @starting_point.nil?
-      puts 'You must specify the branch starting point'
-      puts 'Usage:'
-      puts '$ git-branch-squash develop'
-      exit 1
-    end
-  end
+# Find the parent of the branch
+local branchParent=$1
+[[ $branchParent == '' ]] && branchParent="$(git-branch-parent)"
 
-  # When given a branch, will find the closer between the remote and local one
-  def starting_point(commit)
-    # This is not a known local branch, we use it directly
-    return commit unless branch?(commit)
+# Gather all commit messages since then
+local tmpCommitMessagePath=/tmp/vit_git-branch-squash-commitmsg
+# First, the main commit message being the branch name
+echo "$branchParent\n\n" > $tmpCommitMessagePath
+# Now, the core of the message being all the commits
+git log --format=%B --reverse ${branchParent}... \
+  >> $tmpCommitMessagePath
 
-    remote_branch = "#{current_remote}/#{commit}"
-    closer_commit(commit, remote_branch)
-  end
+# Cancel all commits
+git reset --soft $branchParent
 
-  def run
-    branch_origin = `git merge-base --fork-point #{@starting_point}`.strip
-    commit_messages = `git log --format=%B --reverse #{branch_origin}...`
-    commit_messages = commit_messages.gsub("'", "'\"'\"'")
-    system("git reset --soft #{branch_origin} && git commit --edit -m'#{commit_messages}'")
-  end
-end
-GitBranchSquash.new(*ARGV).run
+# Commit them in one commit
+git commit --edit -F $tmpCommitMessagePath
