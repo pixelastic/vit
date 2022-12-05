@@ -15,6 +15,6 @@ local withIcon="0"
 # Display name and color
 local remoteColor="$(git-remote-color $remoteName)"
 local displayRemoteName=$remoteName
-[[ $withIcon == "1" ]] && displayRemoteName=" $remoteName"
+[[ $withIcon == "1" ]] && displayRemoteName=" $remoteName"
 
 colorize "$displayRemoteName" $remoteColor
