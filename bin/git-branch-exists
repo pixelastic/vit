@@ -1,19 +1,6 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Check if the given local branch exists
 
-# Checks if the specified branch exists
-# Usage:
-#   $ git branch-exist {branchName}
-class GitBranchExists
-  include GitHelper
-  def initialize(*args)
-    @branch = args[0]
-  end
+local branchName="$1"
 
-  def run
-    exit 1 unless branch?(@branch)
-    exit 0
-  end
-end
-GitBranchExists.new(*ARGV).run
-
+git show-ref --quiet refs/heads/${branchName};
