@@ -1,37 +1,29 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Wrapper for removing one or several branches from a remote
-#
+#!/usr/bin/env zsh
+# Remove one or several branches from a remote
 # Usage :
-# $ git-branch-remove-remote branch (origin)
-# $ git-branch-remove-remote branch1 branch2 (origin)
-# $ git-branch-remove-remote branch upstream
-# $ git-branch-remove-remote upstream branch
-class GitBranchRemoveRemote
-  include GitHelper
+# $ git-branch-remove-remote branch
+# $ git-branch-remove-remote branch1 branch2
 
-  def initialize(*args)
-    @args = get_real_args(args)
+local inputBranches="$*"
 
-    # We can pass several branches to delete, so we'll first exclude the remote
-    # from the list
-    elements = guess_elements(@args)
-    @remote_name = elements[:remote]
+# Fail safe
+if [[ $# -eq 0 ]]; then
+  echo "You need to pass at least one branch name."
+  exit 1
+fi
 
-    @branches = args - [@remote_name]
+local currentRemote="$(git-remote-current)"
+local displayRemoteName="$(git-remote-colorize $currentRemote --with-icon)"
 
-    return if @branches.size > 0
+for branchName in $inputBranches; do
+  local displayBranchName="$(git-branch-colorize $branchName --with-icon)"
 
-    puts '✘ You must pass at least the branch to delete'
-    exit 1
-  end
+  # Exclude branches that are not on the remote
+  if ! git-branch-exists-remote $branchName; then
+    echo "$displayBranchName doesn't exist on $displayRemoteName"
+    break;
+  fi
 
-  def run
-    options = [
-      '--no-verify',
-      "--delete #{@branches.join(' ')}"
-    ]
-    system("git push #{@remote_name} #{options.join(' ')}")
-  end
-end
-GitBranchRemoveRemote.new(*ARGV).run
+  git push $currentRemote --no-verify --delete $branchName
+  echo "$displayBranchName deleted from $displayRemoteName"
+done
