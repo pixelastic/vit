@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+# Return the string color of a specific branch
+
+local branchName="$1"
+
+local DEFAULT_BRANCH_COLOR='orange'
+
+declare -A BRANCH_COLORS
+BRANCH_COLORS=()
+BRANCH_COLORS[HEAD]='red'
+BRANCH_COLORS[develop]='yellow'
+BRANCH_COLORS[master]='blue'
+BRANCH_COLORS[main]='blue'
+
+# Known branch
+local knownColor=$BRANCH_COLORS[$branchName]
+if [[ $knownColor != '' ]]; then
+  echo $knownColor
+  return
+fi
+
+# Default branch
+echo $DEFAULT_BRANCH_COLOR

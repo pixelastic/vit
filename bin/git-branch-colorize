@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+# Parsing arguments into positional and flags
+local argsf=($(argsf $@))
+local argsp=($(argsp $@))
+
+# Branch name
+local branchName="$argsp[1]"
+
+# We don't display an icon by default
+local withIcon="0"
+[[ $argsf =~ "--with-icon" ]] && withIcon="1"
+
+
+# Display name and color
+local branchColor="$(git-branch-color $branchName)"
+local displayBranchName=$branchName
+[[ $withIcon == "1" ]] && displayBranchName=" $branchName"
+
+colorize "$displayBranchName" $branchColor
