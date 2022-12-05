@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+# Parsing arguments into positional and flags
+local argsf=($(argsf $@))
+local argsp=($(argsp $@))
+
+# Remote name
+local remoteName="$argsp[1]"
+
+# We don't display an icon by default
+local withIcon="0"
+[[ $argsf =~ "--with-icon" ]] && withIcon="1"
+
+
+# Display name and color
+local remoteColor="$(git-remote-color $remoteName)"
+local displayRemoteName=$remoteName
+[[ $withIcon == "1" ]] && displayRemoteName=" $remoteName"
+
+colorize "$displayRemoteName" $remoteColor

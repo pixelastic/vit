@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+# Return the string color of a specific remote
+
+local remoteName="$1"
+
+local DEFAULT_REMOTE_COLOR='yellow'
+
+declare -A REMOTE_COLORS
+REMOTE_COLORS=()
+REMOTE_COLORS[HEAD]='red'
+REMOTE_COLORS[origin]='orange'
+REMOTE_COLORS[pixelastic]='green'
+REMOTE_COLORS[upstream]='blue'
+
+# Known remote
+local knownColor=$REMOTE_COLORS[$remoteName]
+if [[ $knownColor != '' ]]; then
+  echo $knownColor
+  return
+fi
+
+# Default remote
+echo $DEFAULT_REMOTE_COLOR
