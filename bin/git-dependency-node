@@ -1,0 +1,34 @@
+#!/usr/bin/env zsh
+# Update node dependencies if they changed since the specified commit
+
+local sourceCommit="$1"
+local filepath="$(git root)/yarn.lock"
+
+# Fail quickly if no such file
+if [[ ! -f "$filepath" ]]; then
+  exit 1
+fi
+
+# File didn't change since the commit
+if ! git-file-has-changed $filepath $sourceCommit; then
+  exit 1
+fi
+
+# TODO: Need to create a generic script that:
+# - run in background
+# - write a file on disk while executing
+# - delete it at the end
+
+echo "Need to update"
+
+
+#     filepath = File.join(repo_root, 'yarn.lock')
+#     return unless File.exist?(filepath)
+#     return unless file_changed(old_commit, current_commit, filepath)
+
+#     lockfile = File.join(repo_root, '.git', 'yarn-install-in-progress')
+#     run_in_background('yarn install', lockfile)
+
+# local originCommit=$1
+
+

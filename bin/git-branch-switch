@@ -1,31 +1,44 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Wrapper for switching to another branch. 
-# If the branch does not exist, try the next in the list
-#
+#!/usr/bin/env zsh
+# Switch to the specified branches, stop when one exists
 # Usage :
 # $ git-branch-switch master
 # $ git-branch-switch master main
-# $ git-branch-switch m
-class GitBranchSwitch
-  include GitHelper
 
-  def initialize(*args)
-    args = replace_short_aliases(args)
-    @branches = args
-  end
+for branchName in $argv; do
+  # Skip non-existing branches
+  if ! git-branch-exists $branchName; then
+    continue
+  fi
 
-  def run
-    old_commit = current_commit
+  local previousCommit="$(git-commit-current)"
 
-    # Keep only the first existing branch
-    branch_name = @branches.find { |branch| branch?(branch) }
+  # Switch to the branch
+  git checkout --quiet $branchName
 
-    exit 1 if branch_name.empty?
+  git-dependencies-update $previousCommit
 
-    system("git checkout #{branch_name}")
+  break
+done
 
-    update_dependencies(old_commit)
-  end
-end
-GitBranchSwitch.new(*ARGV).run
+#class GitBranchSwitch
+#  include GitHelper
+
+#  def initialize(*args)
+#    args = replace_short_aliases(args)
+#    @branches = args
+#  end
+
+#  def run
+#    old_commit = current_commit
+
+#    # Keep only the first existing branch
+#    branch_name = @branches.find { |branch| branch?(branch) }
+
+#    exit 1 if branch_name.empty?
+
+#    system("git checkout #{branch_name}")
+
+#    update_dependencies(old_commit)
+#  end
+#end
+#GitBranchSwitch.new(*ARGV).run

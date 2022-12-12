@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+# Update node and ruby dependencies if they changed since the specified commit
+
+local originCommit=$1
+
+
