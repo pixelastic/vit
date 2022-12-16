@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
-set -e
 # Remove one or several branches from a remote
 # Usage :
 # $ git-branch-remove-remote branch
 # $ git-branch-remove-remote branch1 branch2
+
+set -e
 
 local inputBranches="$*"
 

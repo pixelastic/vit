@@ -1,8 +1,9 @@
 #!/usr/bin/env zsh
-set -e
 # Create a new local branch.
 # Usage:
 # $ git-branch-create foo
+
+set -e
 
 local branchName=$1
 

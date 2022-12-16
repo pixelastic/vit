@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
 # Return the string color of a specific branch
+# Usage:
+# $ git-branch-color master
+#   => blue
 
 local branchName="$1"
 

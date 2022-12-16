@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
 # Display name of current branch
+# Usage:
+# $ git-branch-current
+#   => master
 
 git rev-parse --abbrev-ref HEAD

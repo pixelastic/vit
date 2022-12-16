@@ -1,4 +1,10 @@
 #!/usr/bin/env zsh
+# Returns a colorized version of a branch name
+# Usage:
+# $ git-branch-colorize master
+#   => master (in blue)
+# $ git-branch-colorize --with-icon master
+#   =>  master (in blue)
 
 # Parsing arguments into positional and flags
 local argsf=($(argsf $@))

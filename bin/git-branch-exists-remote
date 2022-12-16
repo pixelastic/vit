@@ -1,5 +1,9 @@
 #!/usr/bin/env zsh
 # Checks if the given branch exists on the remote
+# Usage:
+# $ git-branch-exists-remote develop
+
+
 git ls-remote --heads 2>/dev/null | \
   awk '{print $2}' | \
   sed 's_refs/heads/__' | \

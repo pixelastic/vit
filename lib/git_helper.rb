@@ -65,11 +65,11 @@ module GitHelper
   def push_pull_indicator(branch_name)
     return ' ' if branch_gone?(branch_name)
 
-    code = `git branch-remote-status #{branch_name}`.strip
-    return ' ' if code == 'local_ahead'
-    return ' ' if code == 'local_behind'
-    return ' ' if code == 'local_diverged'
-    return ' ' if code == 'local_never_pushed'
+    code = `git-branch-push-status #{branch_name}`.strip
+    return ' ' if code == 'ahead'
+    return ' ' if code == 'behind'
+    return ' ' if code == 'diverged'
+    return ' ' if code == 'never_pushed'
   end
 
   def longest_by_type(list, type)

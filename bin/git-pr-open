@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 # Opens PRs in the browser
+# Usage:
+# $ git-pr-open            # Opens PR page
+# $ git-pr-open 42         # Opens PR 42
+
+# Stop if not in a GitHub repo
+git-directory-is-github || exit 1
+
 local prNumber=$1
 local openedUrl="$(git directory-url)"
 

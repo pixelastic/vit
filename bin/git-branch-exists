@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 # Check if the given local branch exists
+# Usage:
+# $ git-branch-exists master
 
 local branchName="$1"
 

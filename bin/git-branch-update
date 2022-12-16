@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
-# Will fetch all branches from origin, and track them locally
-# Will also stop tracking any branch that is deleted on the remote
+# Synchronize local branches with remote ones:
+# - Fetches all remote branch and track them locally
+# - Remove any local branch that has been deleted on the remote
+# - Does not remove local branches that were never pushed
 
 if git fetch --all --prune &>/dev/null; then
   echo "✔ Fetched all remote branches"
@@ -14,6 +16,7 @@ do
 
   localBranch=${remoteBranch/origin\/}
   if git branch $localBranch $remoteBranch &>/dev/null; then
-    echo "✔ Tracking $localBranch"
+    colorizedBranchName="$(git-branch-colorize ${localBranch} --with-icon)"
+    echo "$colorizedBranchName tracked locally"
   fi
 done 

@@ -1,9 +1,12 @@
 #!/usr/bin/env zsh
-set -e
-# Squash all commit of the current branch together
+# Squash all commits of the current branch together
+# It will create a new commit with a text message set as the sum of all commits
+#
 # Usage :
-# $ git-branch-squash
-# $ git-branch-squash develop
+# $ git-branch-squash                 # Squash from the latest fork
+# $ git-branch-squash develop         # Squash from develop
+
+set -e
 
 # Find the parent of the branch
 local branchParent=$1

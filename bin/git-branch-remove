@@ -1,2 +1,6 @@
 #!/usr/bin/env zsh
+# Delete a local branch
+# Usage:
+# $ git-branch-remove develop
+
 git branch -D $@

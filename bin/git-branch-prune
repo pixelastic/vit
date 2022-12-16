@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
 # Prune all local branches whose upstream is gone
+# Usage:
+# $ git-branch-prune        # Only displays branches to prune
+# $ git-branch-prune -f     # Actually do it
 
 # Runs as dry-run by default, unless -f is passed
 local forceRun="0"

@@ -2,6 +2,8 @@
 # Return the closest parent branch of the current branch
 # In other words: the nearest commit that resides on another branch, and what
 # branch is that?
+# Usage:
+# $ git-branch-parent
 
 git log --format=%d \
   | text-remove-empty-lines \

@@ -1,5 +1,11 @@
 #!/usr/bin/env zsh
 # Count how many open issues the current repo has
+# Usage:
+# $ git-issue-count
+
+# Stop if not in a GitHub repo
+git-directory-is-github || exit 1
+
 gh issue list --limit=1000 --json=number \
   | cat '-' \
   | jq length

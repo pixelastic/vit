@@ -9,6 +9,12 @@
 local remote=$1
 [[ $remote == '' ]] && remote=$(git remote-current)
 
-git remote-exists $remote || exit 1
+# Find the remote url
+local remoteUrl="$(git config --get remote.${remote}.url)"
 
-git config --get remote.${remote}.url
+# Fails if no remote
+if [[ $remoteUrl == '' ]]; then
+  exit 1
+fi
+
+echo $remoteUrl
