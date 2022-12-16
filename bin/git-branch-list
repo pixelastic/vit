@@ -1,102 +1,146 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-require 'awesome_print'
+#!/usr/bin/env zsh
+# Display the list of local branches
+# Usage:
+# $ git-branch-list
 
-# Branch representation
-class Branch
-  include GitHelper
-  def initialize(data)
-    @hash = data[:hash]
-    @is_current = data[:is_current]
-    @name = data[:name]
-    @message = data[:message]
-    @remote_name = data[:remote_name]
-    @remote_branch_name = data[:remote_branch_name]
-    @remote_ahead = data[:remote_ahead]
-    @remote_behind = data[:remote_behind]
-    @remote_is_gone = data[:remote_is_gone]
+# If is current
+# branch name
+# commit
+# time ago
+# message
 
-    data = commit_info(@hash)
-    @date = data[:date]
-    @date_relative = data[:date_relative]
-  end
-
-  def data_as_array
-    display = []
-    # Mark current branch
-    display << (@is_current ? '' : ' ')
-
-    # Marker
-    display << push_pull_indicator(@local_name)
-
-    has_different_remote = (!@remote_branch_name.nil? && @remote_branch_name != @name)
-    display_name = (has_different_remote ? "#{@name}:#{@remote_branch_name}" : @name)
-    display << display_name
-
-    display << @hash
-
-    display << (@remote_behind ? "-#{@remote_behind}" : nil)
-    display << (@remote_ahead ? "+#{@remote_ahead}" : nil)
-
-    is_old = Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
-    display_time = " #{@date_relative}"
-                 .gsub('weeks', 'w.')
-                 .gsub('days', 'd.')
-                 .gsub(' ago', '')
-    display << (is_old ? display_time : nil)
+local separator="__#__"
+local gitBranchFormat=""
+gitBranchFormat+="%(refname:short)${separator}"
+gitBranchFormat+="%(objectname:short)${separator}"
+gitBranchFormat+="%(committerdate:relative)${separator}"
+gitBranchFormat+="%(contents:subject)${separator}"
 
 
-    display << @message
+local rawGitBranches="$(git branch --format="$gitBranchFormat")"
+while read -r rawGitBranch; do
+  echo "==="
+  echo $rawGitBranch
+  # I got the full line, now I need to split on the separator, and find each
+  # part
+  local rawBranchDetails=($(text-split $rawGitBranch "__#__"))
+  echo $rawBranchDetails[1]
+  echo $rawBranchDetails[2]
+  echo $rawBranchDetails[3]
 
-    display
-  end
-end
+done <<<$rawGitBranches
 
-# Display the complete list of all branches
-class GitBranchListAll
-  include GitHelper
 
-  def initialize(*args)
-    @args = get_flag_args(args)
-    @branches = branches
-  end
+#   | while read rawGitBranch; dok
 
-  def branches
-    output = `git branch -vv`
-    branches = []
-    output.each_line do |line|
-      branch_data = parse_raw_branch(line)
-      branches << Branch.new(branch_data)
-    end
-    branches
-  end
+# git branch --no-color -r | while read remoteBranch
+# echo $rawGitBranches
+# for rawGitBranch in $rawGitBranches; do
+#   echo "==="
+# done
 
-  def run
-    branches_as_array = @branches.map(&:data_as_array)
-    lines = pad_two_dimensionnal_array(branches_as_array)
+# echo $rawBranches
+#   | column --table-noheadings --separator "/" -t
 
-    # Colorize output
-    output = lines.map do |line|
-      branch_name = line[2]
-      # Current branch
-      line[0] = colorize(line[0], color(:valid))
-      # Marker
-      line[1] = colorize(line[1], branch_color(branch_name.strip))
-      # Name
-      line[2] = colorize(line[2], branch_color(branch_name.strip))
-      # hash
-      line[3] = colorize(line[3], color(:hash))
-      # behind
-      line[4] = colorize(line[4], color(:behind))
-      # ahead
-      line[5] = colorize(line[5], color(:ahead))
-      # date
-      line[6] = colorize(line[6], color(:date))
-      # message
-      line[7] = colorize(line[7], color(:message))
-      line.join(' ')
-    end
-    puts output
-  end
-end
-GitBranchListAll.new(*ARGV).run
+##!/usr/bin/env ruby
+#require_relative '../lib/git_helper'
+#require 'awesome_print'
+
+## Branch representation
+#class Branch
+#  include GitHelper
+#  def initialize(data)
+#    @hash = data[:hash]
+#    @is_current = data[:is_current]
+#    @name = data[:name]
+#    @message = data[:message]
+#    @remote_name = data[:remote_name]
+#    @remote_branch_name = data[:remote_branch_name]
+#    @remote_ahead = data[:remote_ahead]
+#    @remote_behind = data[:remote_behind]
+#    @remote_is_gone = data[:remote_is_gone]
+
+#    data = commit_info(@hash)
+#    @date = data[:date]
+#    @date_relative = data[:date_relative]
+#  end
+
+#  def data_as_array
+#    display = []
+#    # Mark current branch
+#    display << (@is_current ? '' : ' ')
+
+#    # Marker
+#    display << push_pull_indicator(@local_name)
+
+#    has_different_remote = (!@remote_branch_name.nil? && @remote_branch_name != @name)
+#    display_name = (has_different_remote ? "#{@name}:#{@remote_branch_name}" : @name)
+#    display << display_name
+
+#    display << @hash
+
+#    display << (@remote_behind ? "-#{@remote_behind}" : nil)
+#    display << (@remote_ahead ? "+#{@remote_ahead}" : nil)
+
+#    is_old = Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
+#    display_time = " #{@date_relative}"
+#                 .gsub('weeks', 'w.')
+#                 .gsub('days', 'd.')
+#                 .gsub(' ago', '')
+#    display << (is_old ? display_time : nil)
+
+
+#    display << @message
+
+#    display
+#  end
+#end
+
+## Display the complete list of all branches
+#class GitBranchListAll
+#  include GitHelper
+
+#  def initialize(*args)
+#    @args = get_flag_args(args)
+#    @branches = branches
+#  end
+
+#  def branches
+#    output = `git branch -vv`
+#    branches = []
+#    output.each_line do |line|
+#      branch_data = parse_raw_branch(line)
+#      branches << Branch.new(branch_data)
+#    end
+#    branches
+#  end
+
+#  def run
+#    branches_as_array = @branches.map(&:data_as_array)
+#    lines = pad_two_dimensionnal_array(branches_as_array)
+
+#    # Colorize output
+#    output = lines.map do |line|
+#      branch_name = line[2]
+#      # Current branch
+#      line[0] = colorize(line[0], color(:valid))
+#      # Marker
+#      line[1] = colorize(line[1], branch_color(branch_name.strip))
+#      # Name
+#      line[2] = colorize(line[2], branch_color(branch_name.strip))
+#      # hash
+#      line[3] = colorize(line[3], color(:hash))
+#      # behind
+#      line[4] = colorize(line[4], color(:behind))
+#      # ahead
+#      line[5] = colorize(line[5], color(:ahead))
+#      # date
+#      line[6] = colorize(line[6], color(:date))
+#      # message
+#      line[7] = colorize(line[7], color(:message))
+#      line.join(' ')
+#    end
+#    puts output
+#  end
+#end
+#GitBranchListAll.new(*ARGV).run

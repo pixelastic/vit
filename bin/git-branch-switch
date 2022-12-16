@@ -5,6 +5,7 @@
 # Usage :
 # $ git-branch-switch master
 # $ git-branch-switch master main
+set -e
 
 for branchName in $argv; do
   # Skip non-existing branches

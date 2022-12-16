@@ -1,65 +1,49 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Pull a branch
+# Usage:
+# $ git-branch-pull           # Pull the current branch
+# $ git-branch-pull develop   # Pull a specific branch and switch to it
+set -e
 
-# Wrapper for pulling from remote
-# Usage :
-# $ git-branch-pull
-# $ git-branch-pull upstream {current_branch}
-# $ git-branch-pull {origin} develop
-# $ git-branch-pull upstream develop
-# $ git-branch-pull develop upstream
-# $ git-branch-pull username:branch (on GitHub)
-class GitBranchPull
-  include GitHelper
+local currentBranch="$(git-branch-current)"
+local currentRemote="$(git-remote-current)"
 
-  def initialize(*args)
-    @flags = get_flag_args(args)
-    @args = get_real_args(args)
+# First argument is the name of the branch to pull
+local targetBranch="$1"
+if [[ $targetBranch == '' ]]; then
+  targetBranch=$currentBranch
+fi
 
-    @flags << '--rebase' 
+local colorizedBranch="$(git-branch-colorize $targetBranch --with-icon)"
+local colorizedRemote="$(git-remote-colorize $currentRemote --with-icon)"
 
-    elements = guess_elements(@args)
-    @remote_name = elements[:remote]
-    @branch_name = elements[:unknown][0] || elements[:branch]
+# We always update tags when pulling
+git fetch --tags
 
-    # Trying to pull a branch from another user on github
-    use_branch_as_github_fork(@branch_name) if @branch_name[':']
-  end
+# Stop if the branch does not exist on the remote
+if ! git-branch-exists-remote $targetBranch; then
+  echo "✘ Branch $colorizedBranch doesn't exist on $colorizedRemote"
+  exit 1
+fi
 
-  # Reads username:branchname string and create necessary remote
-  def use_branch_as_github_fork(github_fork)
-    username, @branch_name = github_fork.split(':')
+# Pulling on top of the current branch
+if [[ $targetBranch == $currentBranch ]]; then
+  local currentCommit="$(git-commit-current)"
 
-    @remote_name = username
+  # Pull remote branch
+  git pull $currentRemote $targetBranch
 
-    # Create remote for user
-    unless remote?(@remote_name)
-      current_remote_url = remote_url
-      repo_name = current_remote_url.split('/')[1]
-      remote_url = "git@github.com:#{username}/#{repo_name}"
-      system("git-remote-create #{@remote_name} #{remote_url}")
-    end
-  end
+  # Update dependencies
+  git-dependencies-update $previousCommit
 
-  def pull_unknown_branch
-    system("git fetch #{@remote_name} #{@branch_name}:#{@branch_name}")
-    system("git checkout #{@branch_name}")
-  end
+  echo "$colorizedBranch branch updated"
 
-  def pull_known_branch
-    system("git pull #{@flags.join(' ')} #{@remote_name} #{@branch_name}")
-    system("git fetch --tags #{@remote_name}")
-    system('git submodule update')
-  end
+  exit 0
+fi
 
-  def run
-    old_commit = current_commit
-    if branch?(@branch_name)
-      pull_known_branch
-    else
-      pull_unknown_branch
-    end
-    update_dependencies(old_commit)
-  end
-end
-GitBranchPull.new(*ARGV).run
+# Pulling a different branch
+
+# We fetch the branch locally, then we switch to it
+git fetch $currentRemote $targetBranch:$targetBranch
+git-branch-switch $targetBranch
+echo "Switched to latest branch $colorizedBranch"

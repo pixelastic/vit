@@ -7,5 +7,7 @@
 
 local originCommit=$1
 
+git submodule update
+
 git-dependencies-update-node $originCommit
 git-dependencies-update-ruby $originCommit
