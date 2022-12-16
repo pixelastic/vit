@@ -12,7 +12,7 @@ local lockfilePath="${gitRoot}/.git/oroshi_bundle_install_in_progress"
 # Convert all glob patterns to exact filepaths
 local beaconFilepaths=()
 for beaconPattern in $beaconPatterns; do
-  beaconFilepaths+=($~beaconPattern)
+  beaconFilepaths+=($(glob $beaconPattern))
 done
 
 for beaconFilepath in $beaconFilepaths; do
