@@ -1,47 +1,12 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Wrapper for pushing to remote
-# - Will init the upstream branch on first push
-# - Will allow user to specify a remote and a branch (default to origin and
-#   current branch)
-# - Is clever about what is specified : branch or remote
-#
-# Usage :
-# $ git-remote-push
-# $ git-remote-push remote (current_branch)
-# $ git-remote-push (origin) branch
-# $ git-remote-push remote branch
-class GitRemotePush
-  include GitHelper
+#!/usr/bin/env zsh
+# Push a branch
+# Usage:
+# $ git-branch-push                   # Pushes current branch to current remote
 
-  def initialize(*args)
-    @flags = get_flag_args(args)
-    @args = get_real_args(args)
+local currentRemote="$(git-remote-current)"
+local currentBranch="$(git-branch-current)"
 
-    elements = guess_elements(@args)
-    @remote_name = elements[:remote]
-    @branch_name = elements[:branch]
-    @args -= [@remote_name, @branch_name]
-  end
-
-  def run
-    is_pushing_to_default_remote = (@remote_name == current_remote)
-
-    # Force setting the upstream
-    @flags << '--set-upstream'
-
-    # Pushing to specific remote
-    @flags << '-u' unless is_pushing_to_default_remote
-
-    @flags += @args
-
-    # We use the local-name:remote-name syntax for branches so we can push to
-    # branches with a different name
-    branch = "#{current_branch}:#{@branch_name}"
-
-    command = "git push #{@flags.join(' ')} #{@remote_name} #{branch}"
-
-    system(command)
-  end
-end
-GitRemotePush.new(*ARGV).run
+git push \
+  --set-upstream \
+  $currentRemote \
+  $currentBranch
