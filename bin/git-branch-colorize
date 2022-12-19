@@ -5,9 +5,12 @@
 # $ git-branch-colorize master             # master
 # $ git-branch-colorize --with-icon        #  master
 
-# Parsing arguments into positional and flags
-local argsf=(${(f)"$(argsf $@)"})
-local argsp=(${(f)"$(argsp $@)"})
+# Filter positional arguments and flags
+local argsp=()
+local -A argsf; argsf=()
+for arg in $argv; do
+  [[ "$arg" =~ "^-" ]] && argsf[$arg]=1 || argsp+="$arg"
+done
 
 # Branch name {{{
 local branchName="$argsp[1]"
@@ -20,7 +23,7 @@ fi
 local branchColor="$(git-branch-color $branchName)"
 
 # If --with-icon is not passed, we simply display the colored branch
-if [[ $argsf != *"--with-icon"* ]]; then
+if [[ "$argsf[--with-icon]" != 1 ]]; then
   colorize "$branchName" $branchColor
   exit
 fi
@@ -30,12 +33,12 @@ fi
 local branchPushStatus="$(git-branch-push-status $branchName)"
 
 if [[ $branchPushStatus = 'never_pushed' ]]; then
-  colorize " $branchName" blue3
+  colorize " $branchName" blue7
   exit
 fi
 
 if [[ $branchPushStatus = 'identical' ]]; then
-  colorize " $branchName" $branchColor
+  colorize "$branchName" $branchColor
   exit
 fi
 

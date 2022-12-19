@@ -19,12 +19,19 @@ REMOTE_COLORS[origin]='yellow'
 REMOTE_COLORS[pixelastic]='green'
 REMOTE_COLORS[upstream]='blue'
 
+# Remote doesn't exist
+if ! git-remote-exists "$remoteName"; then
+  echo red
+  exit
+fi
+
 # Known remote
 local knownColor=$REMOTE_COLORS[$remoteName]
 if [[ $knownColor != '' ]]; then
   echo $knownColor
   exit
 fi
+
 
 # Default remote
 echo $DEFAULT_REMOTE_COLOR

@@ -5,9 +5,12 @@
 # $ git-commit-colorize upstream           # abcdef
 # $ git-commit-colorize --with-icon        #  abcdef
 
-# Parsing arguments into positional and flags
-local argsf=(${(f)"$(argsf $@)"})
-local argsp=(${(f)"$(argsp $@)"})
+# Filter positional arguments and flags
+local argsp=()
+local -A argsf; argsf=()
+for arg in $argv; do
+  [[ "$arg" =~ "^-" ]] && argsf[$arg]=1 || argsp+="$arg"
+done
 
 # Commit hash
 local commitHash="$argsp[1]"
@@ -15,11 +18,11 @@ if [[ $commitHash == '' ]]; then
   commitHash="$(git-commit-current)"
 fi
 
-# If --with-icon is not passed, we simply display the colored commit
-if [[ $argsf != *"--with-icon"* ]]; then
-  colorize "$commitHash" indigo
+# If --with-icon is passed, we add an icon
+if [[ "$argsf[--with-icon]" == 1 ]]; then
+  colorize " $commitHash" indigo
   exit
 fi
 
-colorize " $commitHash" indigo
+colorize "$commitHash" indigo
 exit

@@ -8,5 +8,5 @@ local currentBranch="$(git-branch-current)"
 
 git push \
   --set-upstream \
-  $currentRemote \
-  $currentBranch
+  "$currentRemote" \
+  "$currentBranch"

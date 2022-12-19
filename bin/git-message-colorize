@@ -4,9 +4,12 @@
 # $ git-message-colorize "fix stuff"                  # fix stuff
 # $ git-message-colorize "fix stuff" --with-icon      #  fix stuff
 
-# Parsing arguments into positional and flags
-local argsf=(${(f)"$(argsf $@)"})
-local argsp=(${(f)"$(argsp $@)"})
+# Filter positional arguments and flags
+local argsp=()
+local -A argsf; argsf=()
+for arg in $argv; do
+  [[ "$arg" =~ "^-" ]] && argsf[$arg]=1 || argsp+="$arg"
+done
 
 # Message {{{
 local message="$argsp[1]"
@@ -17,7 +20,7 @@ fi
 # }}}
 
 # If --with-icon is not passed, we simply display the colored message
-if [[ $argsf != *"--with-icon"* ]]; then
+if [[ "$argsf[--with-icon]" != 1 ]]; then
   colorize "$message" gray
   exit
 fi

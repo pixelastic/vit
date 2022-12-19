@@ -1,27 +1,24 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Change a branch remote
+#!/usr/bin/env zsh
+# Change the remote of the current branch
 # Usage:
-# $ git remote-switch upstream
-# $ git remote-switch branch upstream
-# $ git remote-switch upstream branch
-#
-# If no branch is specified, will update the remote of the current branch.
-class GitRemoteSwitch
-  include GitHelper
+# $ git-remote-switch pixelastic    # Make pixelastic the branch remote
 
-  def initialize(*args)
-    @args = get_real_args(args)
+local remoteName="$1"
+# A remote name is needed
+if [[ "$remoteName" == '' ]]; then
+  echo "✘ You must pass a remote name"
+  exit 1
+fi
 
-    elements = guess_elements(@args)
+# Stop if remote doesn't exist
+local displayRemoteName="$(git-remote-colorize "$remoteName" --with-icon)"
+if ! git-remote-exists "$remoteName"; then
+  echo "✘ Remote $displayRemoteName does not exist"
+  exit 1
+fi
 
-    @remote_name = elements[:remote]
-    @branch_name = elements[:branch]
-  end
-
-  def run
-    system("git branch #{@branch_name} \
-           --set-upstream-to #{@remote_name}/#{@branch_name}")
-  end
-end
-GitRemoteSwitch.new(*ARGV).run
+# We change the remote name directly in the config
+# If we use git branch --set-upstream-to it might warn us about the branch not
+# existing on the remote
+local currentBranch="$(git-branch-current)"
+git-config-set "branch.${currentBranch}.remote" "$remoteName"

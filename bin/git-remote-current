@@ -3,15 +3,4 @@
 # Usage:
 # $ git-remote-current         # Name of current remote
 
-# Read the origin from the current branch config
-local currentBranch="$(git-branch-current)"
-local currentRemote="$(git config "branch.${currentBranch}.remote")"
-if [[ $currentRemote != "" ]]; then
-  echo $currentRemote
-  exit 0
-fi
-
-# If the branch has never been pushed, there is no remote configured, so we'll
-# assume it's "origin"
-echo "origin"
-
+git-branch-remote

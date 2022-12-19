@@ -5,9 +5,12 @@
 # $ git-tag-colorize master             # v1.0
 # $ git-tag-colorize --with-icon        # 炙v1.0
 
-# Parsing arguments into positional and flags
-local argsf=(${(f)"$(argsf $@)"})
-local argsp=(${(f)"$(argsp $@)"})
+# Filter positional arguments and flags
+local argsp=()
+local -A argsf; argsf=()
+for arg in $argv; do
+  [[ "$arg" =~ "^-" ]] && argsf[$arg]=1 || argsp+="$arg"
+done
 
 local currentTag="$(git-tag-current)"
 
@@ -23,7 +26,7 @@ if [[ $tagName == '' ]]; then
 fi
 
 # If --with-icon is not passed, we simply display the colored branch
-if [[ $argsf != *"--with-icon"* ]]; then
+if [[ "$argsf[--with-icon]" != 1 ]]; then
   colorize $colorizeArguments "$tagName" pink
   exit
 fi

@@ -2,13 +2,19 @@
 # Check if the specified branch has its upstream gone
 # Usage:
 # $ git-branch-gone           # Uses current branch
+#   // Uses current branch
 # $ git-branch-gone develop
 
-local branchName=$1
+local branchName="$1"
 if [[ $branchName = '' ]]; then
-  branchName=$(git-branch-current);
+  branchName="$(git-branch-current)"
+fi
+
+# Can't be gone if doesn't exist
+if ! git-branch-exists "$branchName"; then
+  exit 1
 fi
 
 # See if it matches:
 #   branchName aze5c87 [path/to/origin: gone]
-git branch -l -vv | grep "^..${branchName}\( *\)\(.*\) \[\(.*\): gone\]" &>/dev/null
+git branch --list -vv | grep "^..${branchName}\( *\)\(.*\) \[\(.*\): gone\]" &>/dev/null
