@@ -3,12 +3,6 @@
 # Usage:
 # $ git-branch-list
 
-# If is current
-# branch name
-# commit
-# time ago
-# message
-
 # Hopefully this sign will never be used in tags or commits
 local separator="〷"
 local gitBranchFormat=""
@@ -51,6 +45,7 @@ while read -r rawGitBranch; do
   # }}}
 
   # TODO: Add custom remote if not same as current
+  # TODO: Add ahead/behind information compared to remote
 
   # Commit {{{
   row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
@@ -68,57 +63,3 @@ while read -r rawGitBranch; do
 done <<<$rawGitBranches
 
 echo $output | column --table-noheadings --separator "$separator" -t
-
-
-#  def data_as_array
-#    display = []
-
-#    # Marker
-#    display << push_pull_indicator(@local_name)
-
-#    has_different_remote = (!@remote_branch_name.nil? && @remote_branch_name != @name)
-#    display_name = (has_different_remote ? "#{@name}:#{@remote_branch_name}" : @name)
-#    display << display_name
-
-#    display << (@remote_behind ? "-#{@remote_behind}" : nil)
-#    display << (@remote_ahead ? "+#{@remote_ahead}" : nil)
-
-#    is_old = Time.now.to_i - @date.to_time.to_i > 48 * 60 * 60
-#    display_time = " #{@date_relative}"
-#                 .gsub('weeks', 'w.')
-#                 .gsub('days', 'd.')
-#                 .gsub(' ago', '')
-#    display << (is_old ? display_time : nil)
-
-
-#    display << @message
-
-#    display
-#  end
-#end
-
-#    # Colorize output
-#    output = lines.map do |line|
-#      branch_name = line[2]
-#      # Current branch
-#      line[0] = colorize(line[0], color(:valid))
-#      # Marker
-#      line[1] = colorize(line[1], branch_color(branch_name.strip))
-#      # Name
-#      line[2] = colorize(line[2], branch_color(branch_name.strip))
-#      # hash
-#      line[3] = colorize(line[3], color(:hash))
-#      # behind
-#      line[4] = colorize(line[4], color(:behind))
-#      # ahead
-#      line[5] = colorize(line[5], color(:ahead))
-#      # date
-#      line[6] = colorize(line[6], color(:date))
-#      # message
-#      line[7] = colorize(line[7], color(:message))
-#      line.join(' ')
-#    end
-#    puts output
-#  end
-#end
-#GitBranchListAll.new(*ARGV).run

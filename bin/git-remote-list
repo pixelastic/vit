@@ -1,46 +1,148 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-
-# List all remotes
-#
-# Usage :
+#!/usr/bin/env zsh
+# Display the list of remotes
+# Usage:
 # $ git-remote-list
-class GitRemoteList
-  include GitHelper
 
-  def initialize
-    @current_remote = current_remote
-    @remote_list = remote_list
-  end
+# Hopefully this sign will never be used in tags or commits
+local separator="〷"
 
-  def remote_list
-    output = `git remote -v`
-    remotes = []
-    output.each_line do |line|
-      match = line.match(/(\S*)\s*(\S*)\s*\((\S*)\)/)
-      next unless match
-      name, url, type = match.captures
-      next if type == 'fetch'
-      remotes << { name: name, url: url }
-    end
-    remotes
-  end
+local rawGitRemotes="$(git remote)"
+local currentRemote="$(git-remote-current)"
 
-  def output_current_remote(remote)
-    return colorize('', color(:valid)) if @current_remote == remote
-    ' '
-  end
+# Loop through all the raw output, and format/color them before adding them to
+# the output
+local output=""
+while read -r remoteName; do
+  local row=""
 
-  def run
-    longest_name = longest_by_type(@remote_list, :name)
+  # Current remote
+  if [[ "$remoteName" == "$currentRemote" ]]; then
+    row+="$(colorize  green)${separator}"
+  else
+    row+="$separator"
+  fi
+  # }}}
 
-    @remote_list.each do |remote|
-      current_remote = output_current_remote(remote[:name])
-      name = colorize(remote[:name].ljust(longest_name.size),
-                      remote_color(remote[:name]))
-      url = colorize(remote[:url], color(:url))
-      puts "#{current_remote}  #{name}  #{url}"
-    end
-  end
-end
-GitRemoteList.new(*ARGV).run
+  # Remote name {{{
+  row+="$(git-remote-colorize "$remoteName" --with-icon)${separator}"
+  # }}}
+
+  # Remote url {{{
+  local remoteUrl="$(git-remote-url "$remoteName")"
+  row+="$(colorize "$remoteUrl" gray)${separator}"
+  # }}}
+
+  output+="$row\n"
+done <<<$rawGitRemotes
+
+echo $output | column --table-noheadings --separator "$separator" -t
+
+exit
+
+
+
+
+
+local gitBranchFormat=""
+gitBranchFormat+="%(refname:short)${separator}"
+gitBranchFormat+="%(objectname:short)${separator}"
+gitBranchFormat+="%(committerdate:relative)${separator}"
+gitBranchFormat+="%(contents:subject)${separator}"
+
+local rawGitBranches="$(git branch --format="$gitBranchFormat\n")"
+local currentBranch="$(git-branch-current)"
+
+# Loop through all the raw output, and format/color them before adding them to
+# the output
+local output=""
+while read -r rawGitBranch; do
+  # Splitting the line into its various parts
+  local splitLine=$(text-split "$rawGitBranch" "$separator")
+  local branchName="$(text-select-line "$splitLine" 1)"
+  local commitHash="$(text-select-line "$splitLine" 2)"
+  local relativeTime="$(text-select-line "$splitLine" 3)"
+  local commitMessage="$(text-select-line "$splitLine" 4)"
+
+  # Detached head branches look like "(HEAD detached at d57afca)"
+  if [[ "$branchName" =~ "^\(HEAD" ]]; then
+    branchName="HEAD"
+  fi
+
+  local row=""
+
+  #  to mark the current branch {{{
+  if [[ $branchName == $currentBranch ]]; then
+    row+="$(colorize  green)${separator}"
+  else
+    row+="$separator"
+  fi
+  # }}}
+
+  # Branch name {{{
+  row+="$(git-branch-colorize "$branchName" --with-icon)${separator}"
+  # }}}
+
+  # TODO: Add custom remote if not same as current
+
+  # Commit {{{
+  row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
+  # }}}
+
+  # Date {{{
+  row+="$(git-date-colorize "$relativeTime" --with-icon)${separator}"
+  # }}}
+
+  # Commit message {{{
+  row+="$(git-message-colorize "$commitMessage")${separator}"
+  # }}}
+
+  output+="$row\n"
+done <<<$rawGitBranches
+
+echo $output | column --table-noheadings --separator "$separator" -t
+
+
+
+## List all remotes
+##
+## Usage :
+## $ git-remote-list
+#class GitRemoteList
+#  include GitHelper
+
+#  def initialize
+#    @current_remote = current_remote
+#    @remote_list = remote_list
+#  end
+
+#  def remote_list
+#    output = `git remote -v`
+#    remotes = []
+#    output.each_line do |line|
+#      match = line.match(/(\S*)\s*(\S*)\s*\((\S*)\)/)
+#      next unless match
+#      name, url, type = match.captures
+#      next if type == 'fetch'
+#      remotes << { name: name, url: url }
+#    end
+#    remotes
+#  end
+
+#  def output_current_remote(remote)
+#    return colorize('', color(:valid)) if @current_remote == remote
+#    ' '
+#  end
+
+#  def run
+#    longest_name = longest_by_type(@remote_list, :name)
+
+#    @remote_list.each do |remote|
+#      current_remote = output_current_remote(remote[:name])
+#      name = colorize(remote[:name].ljust(longest_name.size),
+#                      remote_color(remote[:name]))
+#      url = colorize(remote[:url], color(:url))
+#      puts "#{current_remote}  #{name}  #{url}"
+#    end
+#  end
+#end
+#GitRemoteList.new(*ARGV).run
