@@ -1,29 +1,38 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Wrapper for creating git tags
-#
-# Usage :
-# $ git-tag-create foo
-# $ git-tag-create foo bar baz
+#!/usr/bin/env zsh
+# Create a new local tag
+# Usage:
+# $ git-tag-create foo         # Add tag to current commit
+# $ git-tag-create foo abcdef  # Add tag to specified commit
 
-class GitTagCreate
-  include GitHelper
+local tagName="$1"
 
-  def initialize(*args)
-    if args.size == 0
-      puts "✘ You must pass at least the name of the tag to create"
-      exit 1
-    end
+# Tag Name {{{
+# Stop if no tag name given
+if [[ $tagName == '' ]]; then
+  echo "✘ You must pass the name of the tag to create"
+  exit 1
+fi
 
-    @tags = args
-  end
+# Stop if such a tag already exists
+if git-tag-exists $tagName; then
+  local colorizedTagName="$(git-tag-colorize $tagName --with-icon)"
+  echo "✘ Tag $colorizedTagName already exists"
+  exit 1
+fi
 
-  def run
-    @tags.each do |tag|
-      puts "✔ Tag #{tag} created" if system("git tag #{tag} 2>/dev/null")
-    end
-  end
-end
-GitTagCreate.new(*ARGV).run()
+# Stop if a branch with the same name exists as it will only lead to confusion
+if git-branch-exists $tagName; then
+  local colorizedBranchName="$(git-branch-colorize $tagName --with-icon)"
+  echo "✘ Branch $colorizedBranchName with the same name already exists"
+  exit 1
+fi
+# }}}
+# Commit Hash {{{
+local commitHash="$2"
+if [[ $commitHash == '' ]]; then
+  commitHash="$(git-commit-current)"
+fi
+# }}}
 
-
+# New local branch
+git tag "$tagName" "$commitHash"

@@ -29,7 +29,7 @@ for branch in $goneBranches; do
   fi
 
   # Deleting the branch
-  echo "Removing $colorizedBranchName"
+  echo "Removing local branch $colorizedBranchName"
   git-branch-remove $branchShortName &>/dev/null
 done
 

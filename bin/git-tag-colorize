@@ -1,0 +1,59 @@
+#!/usr/bin/env zsh
+# Displays a colorized version of a tag name
+# Usage:
+# $ git-tag-colorize                    # {currentTag}
+# $ git-tag-colorize master             # v1.0
+# $ git-tag-colorize --with-icon        # 炙v1.0
+
+# Parsing arguments into positional and flags
+local argsf=(${(f)"$(argsf $@)"})
+local argsp=(${(f)"$(argsp $@)"})
+
+local currentTag="$(git-tag-current)"
+
+# Tag name
+local tagName="$argsp[1]"
+# Use the closest tag if none is passed
+if [[ $tagName == '' ]]; then
+  tagName="$currentTag"
+fi
+# Stop if still no tag found
+if [[ $tagName == '' ]]; then
+  exit 0
+fi
+
+# If --with-icon is not passed, we simply display the colored branch
+if [[ $argsf != *"--with-icon"* ]]; then
+  colorize $colorizeArguments "$tagName" pink
+  exit
+fi
+
+local tagStatus="$(git-tag-status "$tagName")"
+
+# Exact: The tag points specifically to the current commit
+if [[ "$tagStatus" = "exact" ]]; then
+  colorize " $tagName" pink5
+  exit
+fi
+
+# Closest: The tag is the closest in the branch
+if [[ "$tagStatus" = "closest" ]]; then
+  colorize " $tagName" pink
+  exit
+fi
+
+# Parent: The tag is somewhere in the branch
+if [[ "$tagStatus" = "parent" ]]; then
+  colorize "炙$tagName" pink8
+  exit
+fi
+
+# Unrelated: The tag is not in the branch
+if [[ "$tagStatus" = "unrelated" ]]; then
+  colorize "炙$tagName" gray
+  exit
+fi
+
+# Fallback on unknown status
+colorize " $tagName" red
+exit

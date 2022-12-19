@@ -1,22 +1,23 @@
 #!/usr/bin/env zsh
-# Switch to the specified branch
-# If several branches are passed, switch to the first one that exists
+# Switch to the specified branch (or commit, or tag)
+# If several elements are passed, switch to the first one that exists
 #
 # Usage :
-# $ git-branch-switch master
-# $ git-branch-switch master main
+# $ git-branch-switch master       # Move to the master branch
+# $ git-branch-switch 13cd455      # Go into detached HEAD at this commit
+# $ git-branch-switch master main  # Go to master or main
 set -e
 
-for branchName in $argv; do
-  # Skip non-existing branches
-  if ! git-branch-exists $branchName; then
+for commitRef in $argv; do
+  # Skip non-existing commits
+  if ! git-commit-exists $commitRef; then
     continue
   fi
 
   local previousCommit="$(git-commit-current)"
 
   # Switch to the branch
-  git checkout --quiet $branchName
+  git checkout --quiet $commitRef
 
   # Update dependencies if needed
   git-dependencies-update $previousCommit

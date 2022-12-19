@@ -1,20 +1,27 @@
 #!/usr/bin/env zsh
+# Displays a colorized version of a remote name
+# Usage:
+# $ git-remote-colorize                    # {currentRemote}
+# $ git-remote-colorize upstream           # upstream
+# $ git-remote-colorize --with-icon        #  upstream
 
 # Parsing arguments into positional and flags
-local argsf=($(argsf $@))
-local argsp=($(argsp $@))
+local argsf=(${(f)"$(argsf $@)"})
+local argsp=(${(f)"$(argsp $@)"})
 
 # Remote name
 local remoteName="$argsp[1]"
+if [[ $remoteName == '' ]]; then
+  remoteName="$(git-remote-current)"
+fi
 
-# We don't display an icon by default
-local withIcon="0"
-[[ $argsf =~ "--with-icon" ]] && withIcon="1"
-
-
-# Display name and color
 local remoteColor="$(git-remote-color $remoteName)"
-local displayRemoteName=$remoteName
-[[ $withIcon == "1" ]] && displayRemoteName=" $remoteName"
 
-colorize "$displayRemoteName" $remoteColor
+# If --with-icon is not passed, we simply display the colored commit
+if [[ $argsf != *"--with-icon"* ]]; then
+  colorize "$remoteName" "$remoteColor"
+  exit
+fi
+
+colorize " $remoteName" "$remoteColor"
+exit

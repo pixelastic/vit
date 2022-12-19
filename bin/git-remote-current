@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 # Display name of current remote
+# Usage:
+# $ git-remote-current         # Name of current remote
 
 # Read the origin from the current branch config
 local currentBranch="$(git-branch-current)"

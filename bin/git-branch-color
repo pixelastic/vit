@@ -1,10 +1,14 @@
 #!/usr/bin/env zsh
 # Return the string color of a specific branch
 # Usage:
-# $ git-branch-color master
-#   => blue
+# $ git-branch-color             # (current branch) blue
+# $ git-branch-color master      # blue
 
+# Branch name
 local branchName="$1"
+if [[ $branchName == '' ]]; then
+  branchName="$(git-branch-current)"
+fi
 
 local DEFAULT_BRANCH_COLOR='orange'
 

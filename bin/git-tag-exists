@@ -1,18 +1,19 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-
-# Checks if the specified tag exists
+#!/usr/bin/env zsh
+# Check if at tag exists
 # Usage:
-#   $ git tag-exist {tagName}
-class GitTagExists
-  include GitHelper
-  def initialize(*args)
-    @tag = args[0]
-  end
+# $ git-tag-exists v1.0   # Checks if specified tag exists
 
-  def run
-    exit 1 unless tag?(@tag)
-    exit 0
-  end
-end
-GitTagExists.new(*ARGV).run
+
+local tagName="$1"
+if [[ "$tagName" == '' ]]; then
+  echo "✘ You must pass the name of a tag"
+  exit 1
+fi
+
+# To see if the tag exists, we list all tags matching the name. If it outputs
+# nothing, it means the tag doesn't exist.
+local output="$(git tag -l "$tagName")"
+if [[ $output == "" ]]; then
+  exit 1
+fi
+exit 0

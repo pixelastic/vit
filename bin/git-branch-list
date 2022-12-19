@@ -9,66 +9,69 @@
 # time ago
 # message
 
-local separator="__#__"
+# Hopefully this sign will never be used in tags or commits
+local separator="〷"
 local gitBranchFormat=""
 gitBranchFormat+="%(refname:short)${separator}"
 gitBranchFormat+="%(objectname:short)${separator}"
 gitBranchFormat+="%(committerdate:relative)${separator}"
 gitBranchFormat+="%(contents:subject)${separator}"
 
+local rawGitBranches="$(git branch --format="$gitBranchFormat\n")"
+local currentBranch="$(git-branch-current)"
 
-local rawGitBranches="$(git branch --format="$gitBranchFormat")"
+# Loop through all the raw output, and format/color them before adding them to
+# the output
+local output=""
 while read -r rawGitBranch; do
-  echo "==="
-  echo $rawGitBranch
-  # I got the full line, now I need to split on the separator, and find each
-  # part
-  local rawBranchDetails=($(text-split $rawGitBranch "__#__"))
-  echo $rawBranchDetails[1]
-  echo $rawBranchDetails[2]
-  echo $rawBranchDetails[3]
+  # Splitting the line into its various parts
+  local splitLine=$(text-split "$rawGitBranch" "$separator")
+  local branchName="$(text-select-line "$splitLine" 1)"
+  local commitHash="$(text-select-line "$splitLine" 2)"
+  local relativeTime="$(text-select-line "$splitLine" 3)"
+  local commitMessage="$(text-select-line "$splitLine" 4)"
 
+  # Detached head branches look like "(HEAD detached at d57afca)"
+  if [[ "$branchName" =~ "^\(HEAD" ]]; then
+    branchName="HEAD"
+  fi
+
+  local row=""
+
+  #  to mark the current branch {{{
+  if [[ $branchName == $currentBranch ]]; then
+    row+="$(colorize  green)${separator}"
+  else
+    row+="$separator"
+  fi
+  # }}}
+
+  # Branch name {{{
+  row+="$(git-branch-colorize "$branchName" --with-icon)${separator}"
+  # }}}
+
+  # TODO: Add custom remote if not same as current
+
+  # Commit {{{
+  row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
+  # }}}
+
+  # Date {{{
+  row+="$(git-date-colorize "$relativeTime" --with-icon)${separator}"
+  # }}}
+
+  # Commit message {{{
+  row+="$(git-message-colorize "$commitMessage")${separator}"
+  # }}}
+
+  output+="$row\n"
 done <<<$rawGitBranches
 
+echo $output | column --table-noheadings --separator "$separator" -t
 
-#   | while read rawGitBranch; dok
-
-# git branch --no-color -r | while read remoteBranch
-# echo $rawGitBranches
-# for rawGitBranch in $rawGitBranches; do
-#   echo "==="
-# done
-
-# echo $rawBranches
-#   | column --table-noheadings --separator "/" -t
-
-##!/usr/bin/env ruby
-#require_relative '../lib/git_helper'
-#require 'awesome_print'
-
-## Branch representation
-#class Branch
-#  include GitHelper
-#  def initialize(data)
-#    @hash = data[:hash]
-#    @is_current = data[:is_current]
-#    @name = data[:name]
-#    @message = data[:message]
-#    @remote_name = data[:remote_name]
-#    @remote_branch_name = data[:remote_branch_name]
-#    @remote_ahead = data[:remote_ahead]
-#    @remote_behind = data[:remote_behind]
-#    @remote_is_gone = data[:remote_is_gone]
-
-#    data = commit_info(@hash)
-#    @date = data[:date]
-#    @date_relative = data[:date_relative]
-#  end
 
 #  def data_as_array
 #    display = []
-#    # Mark current branch
-#    display << (@is_current ? '' : ' ')
 
 #    # Marker
 #    display << push_pull_indicator(@local_name)
@@ -76,8 +79,6 @@ done <<<$rawGitBranches
 #    has_different_remote = (!@remote_branch_name.nil? && @remote_branch_name != @name)
 #    display_name = (has_different_remote ? "#{@name}:#{@remote_branch_name}" : @name)
 #    display << display_name
-
-#    display << @hash
 
 #    display << (@remote_behind ? "-#{@remote_behind}" : nil)
 #    display << (@remote_ahead ? "+#{@remote_ahead}" : nil)
@@ -95,29 +96,6 @@ done <<<$rawGitBranches
 #    display
 #  end
 #end
-
-## Display the complete list of all branches
-#class GitBranchListAll
-#  include GitHelper
-
-#  def initialize(*args)
-#    @args = get_flag_args(args)
-#    @branches = branches
-#  end
-
-#  def branches
-#    output = `git branch -vv`
-#    branches = []
-#    output.each_line do |line|
-#      branch_data = parse_raw_branch(line)
-#      branches << Branch.new(branch_data)
-#    end
-#    branches
-#  end
-
-#  def run
-#    branches_as_array = @branches.map(&:data_as_array)
-#    lines = pad_two_dimensionnal_array(branches_as_array)
 
 #    # Colorize output
 #    output = lines.map do |line|

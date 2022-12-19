@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+# Displays the commit the specified tag points to
+
+# Tag name
+local tagName="$1"
+if [[ $tagName == '' ]]; then
+  tagName="$(git-tag-current)"
+fi
+
+local commitHash="$(git rev-list --abbrev-commit -1 "$tagName" 2>/dev/null)"
+
+# Error if can't find the commit
+if [[ $commitHash = '' ]]; then
+  exit 1
+fi
+echo $commitHash
+

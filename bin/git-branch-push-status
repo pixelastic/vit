@@ -19,10 +19,20 @@
 #
 # - diverged
 #   Local and remote have diverged
+#
+# - detached
+#   Currently on detached mode
+
 
 local branchName=$1
 if [[ "$branchName" = '' ]]; then
   branchName="$(git-branch-current)"
+fi
+
+# Not in a branch, in detached mode
+if [[ $branchName = 'HEAD' ]]; then
+  echo "detached"
+  exit
 fi
 
 local localHead=$(git rev-parse $branchName@{0} 2>/dev/null)
@@ -51,6 +61,12 @@ fi
 # Merge base is the same as local, it means we are behind
 if [[ "$localHead" = "$remoteMergeBase" ]]; then
   echo "behind"
+  exit
+fi
+
+# Check if the remote is gone
+if git-branch-gone $branchName; then
+  echo "gone"
   exit
 fi
 

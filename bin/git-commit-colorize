@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+# Displays a colorized version of a commit hash
+# Usage:
+# $ git-commit-colorize                    # {currentCommit}
+# $ git-commit-colorize upstream           # abcdef
+# $ git-commit-colorize --with-icon        #  abcdef
+
+# Parsing arguments into positional and flags
+local argsf=(${(f)"$(argsf $@)"})
+local argsp=(${(f)"$(argsp $@)"})
+
+# Commit hash
+local commitHash="$argsp[1]"
+if [[ $commitHash == '' ]]; then
+  commitHash="$(git-commit-current)"
+fi
+
+# If --with-icon is not passed, we simply display the colored commit
+if [[ $argsf != *"--with-icon"* ]]; then
+  colorize "$commitHash" indigo
+  exit
+fi
+
+colorize " $commitHash" indigo
+exit

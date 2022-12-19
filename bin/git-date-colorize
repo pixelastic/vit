@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+# Displays a colorized version of a relative date
+# Usage:
+# $ git-date-colorize "3 months, 2 days ago"             # 3 m., 2d.
+# $ git-date-colorize "3 months, 2 days ago" --with-icon #  3m., 2d.
+
+# Parsing arguments into positional and flags
+local argsf=(${(f)"$(argsf $@)"})
+local argsp=(${(f)"$(argsp $@)"})
+
+# Raw Date {{{
+local rawDate="$argsp[1]"
+# We need a date passed
+if [[ $rawDate == '' ]]; then
+  exit 0
+fi
+local displayDate="$rawDate"
+displayDate="${displayDate/ years/y}"
+displayDate="${displayDate/ months/mo}"
+displayDate="${displayDate/ weeks/w}"
+displayDate="${displayDate/ days/d}"
+displayDate="${displayDate/ hours/h}"
+# }}}
+
+# If --with-icon is not passed, we simply display the colored date
+if [[ $argsf != *"--with-icon"* ]]; then
+  colorize "$displayDate" blue
+  exit
+fi
+
+# Otherwise we add the icon
+colorize " $displayDate" blue
+exit

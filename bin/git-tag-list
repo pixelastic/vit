@@ -1,71 +1,51 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
-# Display the list of current local tags
-# Usage :
-# $ git-tag-list
-# v1.1.2  9242a33  Version 1.1.2
-# v1.1.3  7548e9a  Version 1.1.3
-# v1.1.4  87967bb  Version 1.1.4
+#!/usr/bin/env zsh
+# Display the list of local tags
+# Usage:
+# $ git-tag-list   # Display all local tags
 
-Tag = Struct.new(:name, :hash, :message)
-class TagList
-  include GitHelper
-  # Note:
-  # Git provides two commands to get the list of tags.
-  # One will give us the list of tags, with commit hashes
-  # The other one will give us the list of tags, with commit message
-  # We'll have to reconciliate both before displaying them
+# Hopefully this sign will never be used in tags or commits
+local separator="〷"
+local gitTagFormat=""
+gitTagFormat+="%(refname:short)${separator}"
+gitTagFormat+="%(objectname:short)${separator}"
+gitTagFormat+="%(committerdate:relative)${separator}"
+gitTagFormat+="%(contents:subject)${separator}"
 
-  def initialize(*args)
-    @currentTags = current_tags
-    @tagList = tag_list
-  end
+local rawGitTags="$(git tag --sort=-committerdate --format="$gitTagFormat\n")"
 
-  def tag_list
-    hashes = tags_with_hashes
-    messages = tags_with_messages
-    list = []
-    messages.each do |name, message|
-      list << Tag.new(name, hashes[name], message)
-    end
-    return list
-  end
+# Loop through all the raw output, and format/color them before adding them to
+# the output
+local output=""
+while read -r rawGitTag; do
+  # Splitting the line into its various parts
+  local textSplit="$(text-split "$rawGitTag" "$separator")"
 
-  def tags_with_messages
-    output = %x[git tag -n | sort -V]
-    tags = {}
-    output.each_line do |line|
-      name, message = line.match(/(^[^ ]*)\s*(.*)$/).captures
-      tags[name] = message
-    end
-    return tags
-  end
+  local splitLine=(${(f)"$(text-split "$rawGitTag" "$separator")"})
+  local tagName="$splitLine[1]"
+  local commitHash="$splitLine[2]"
+  local relativeTime="$splitLine[3]"
+  local commitMessage="$splitLine[4]"
 
-  def tags_with_hashes
-    output = %x[git show-ref --tags]
-    tags = {}
-    output.each_line do |line|
-      hash, name = line.match(/^(.{7})[^ ]* refs\/tags\/(.*)$/).captures
-      tags[name] = hash
-    end
-    return tags
-  end
+  local row=""
 
-  def output_current_tag(tag)
-    return colorize("", color(:valid)) if @currentTags.include? tag
-    return " "
-  end
+  # Tag name {{{
+  row+="$(git-tag-colorize $tagName --with-icon)${separator}"
+  # }}}
 
-  def run
-    longest_tag = longest_by_type(@tagList, :name)
+  # Commit {{{
+  row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
+  # }}}
 
-    @tagList.each do |tag|
-      current_tag = output_current_tag(tag[:name])
-      tag_name = colorize(tag[:name].ljust(longest_tag.size), color(:tag))
-      hash = colorize(tag[:hash], color(:hash))
-      message = colorize(tag[:message], color(:message))
-      puts "#{current_tag}  #{tag_name}  #{hash}  #{message}"
-    end
-  end
-end
-TagList.new().run()
+  # Date {{{
+  relativeTime=${relativeTime/ ago/}
+  row+="$(git-date-colorize " $relativeTime" blue)${separator}"
+  # }}}
+
+  # Commit message {{{
+  row+="$(colorize "$commitMessage" gray)${separator}"
+  # }}}
+
+  output+="$row\n"
+done <<<$rawGitTags
+
+echo $output | column --table-noheadings --separator "$separator" -t

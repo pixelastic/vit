@@ -1,26 +1,70 @@
 #!/usr/bin/env zsh
-# Returns a colorized version of a branch name
+# Displays a colorized version of a branch name
 # Usage:
-# $ git-branch-colorize master
-#   => master (in blue)
-# $ git-branch-colorize --with-icon master
-#   =>  master (in blue)
+# $ git-branch-colorize                    # {currentBranch}
+# $ git-branch-colorize master             # master
+# $ git-branch-colorize --with-icon        #  master
 
 # Parsing arguments into positional and flags
-local argsf=($(argsf $@))
-local argsp=($(argsp $@))
+local argsf=(${(f)"$(argsf $@)"})
+local argsp=(${(f)"$(argsp $@)"})
 
-# Branch name
+# Branch name {{{
 local branchName="$argsp[1]"
-
-# We don't display an icon by default
-local withIcon="0"
-[[ $argsf =~ "--with-icon" ]] && withIcon="1"
-
-
-# Display name and color
+# Default to current branch if none specified
+if [[ "$branchName" == '' ]]; then
+  branchName="$(git-branch-current)"
+fi
+# }}}
+# Branch color
 local branchColor="$(git-branch-color $branchName)"
-local displayBranchName=$branchName
-[[ $withIcon == "1" ]] && displayBranchName=" $branchName"
 
-colorize "$displayBranchName" $branchColor
+# If --with-icon is not passed, we simply display the colored branch
+if [[ $argsf != *"--with-icon"* ]]; then
+  colorize "$branchName" $branchColor
+  exit
+fi
+
+# If --with-icon is passed, we need to add an icon and display a specific
+# color based on the local/remote relationship
+local branchPushStatus="$(git-branch-push-status $branchName)"
+
+if [[ $branchPushStatus = 'never_pushed' ]]; then
+  colorize " $branchName" blue3
+  exit
+fi
+
+if [[ $branchPushStatus = 'identical' ]]; then
+  colorize " $branchName" $branchColor
+  exit
+fi
+
+if [[ $branchPushStatus = 'ahead' ]]; then
+  colorize " $branchName" blue7
+  exit
+fi
+
+if [[ $branchPushStatus = 'behind' ]]; then
+  colorize " $branchName" blue5
+  exit
+fi
+
+if [[ $branchPushStatus = 'gone' ]]; then
+  colorize " $branchName" red5
+  exit
+fi
+
+if [[ $branchPushStatus = 'diverged' ]]; then
+  colorize " $branchName" red
+  exit
+fi
+
+if [[ $branchPushStatus = 'detached' ]]; then
+  local currentCommit="$(git-commit-current)"
+  colorize " HEAD ($currentCommit)" red
+  exit
+fi
+
+# Fallback on unknown status
+colorize " $branchName" $branchColor
+exit
