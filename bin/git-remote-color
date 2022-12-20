@@ -15,6 +15,7 @@ local DEFAULT_REMOTE_COLOR='yellow'
 declare -A REMOTE_COLORS
 REMOTE_COLORS=()
 REMOTE_COLORS[HEAD]='red'
+REMOTE_COLORS[algolia]='blue4'
 REMOTE_COLORS[origin]='yellow'
 REMOTE_COLORS[pixelastic]='green'
 REMOTE_COLORS[upstream]='blue'

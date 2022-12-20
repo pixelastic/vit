@@ -35,19 +35,19 @@ local tagStatus="$(git-tag-status "$tagName")"
 
 # Exact: The tag points specifically to the current commit
 if [[ "$tagStatus" = "exact" ]]; then
-  colorize " $tagName" pink5
+  colorize " $tagName" teal4
   exit
 fi
 
 # Closest: The tag is the closest in the branch
 if [[ "$tagStatus" = "closest" ]]; then
-  colorize " $tagName" pink
+  colorize " $tagName" teal
   exit
 fi
 
 # Parent: The tag is somewhere in the branch
 if [[ "$tagStatus" = "parent" ]]; then
-  colorize "炙$tagName" pink8
+  colorize "炙$tagName" teal8
   exit
 fi
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 # Display the list of local branches
 # Usage:
-# $ git-branch-list
+# $ git-branch-list          # Display all local branches
 
 # Hopefully this sign will never be used in tags or commits
 local separator="〷"
@@ -91,4 +91,8 @@ while read -r rawGitBranch; do
   output+="$row\n"
 done <<<$rawGitBranches
 
-echo $output | column --table-noheadings --separator "$separator" -t
+# Output as columns
+echo $output | column \
+  --separator "$separator" \
+  --table \
+  --table-noheadings

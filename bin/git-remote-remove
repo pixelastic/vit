@@ -10,7 +10,6 @@ if [[ "$remoteName" == "" ]]; then
   exit 1
 fi
 
-git remote rm "$remoteName"
-
 local displayRemoteName="$(git-remote-colorize "$remoteName" --with-icon)"
+git remote rm "$remoteName"
 echo "Remote $displayRemoteName removed"

@@ -1,14 +1,8 @@
-#!/usr/bin/env ruby
-require_relative '../lib/git_helper'
+#!/usr/bin/env zsh
+# Display the current commit hash
+# Usage
+# $ git-commit-current     # Current commit hash
 
-# Returns the name of the current commit
-# Usage:
-#   $ git commit-current
-class GitCommitCurrent
-  include GitHelper
-
-  def run
-    puts current_commit
-  end
-end
-GitCommitCurrent.new.run
+git log \
+  --format='%h' \
+  --max-count 1
