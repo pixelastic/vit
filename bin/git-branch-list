@@ -14,7 +14,7 @@ gitBranchFormat+="_%(upstream:track)${separator}"          # [ahead 4]
 gitBranchFormat+="_%(committerdate:relative)${separator}"  # 3 months ago
 gitBranchFormat+="_%(contents:subject)${separator}"        # fix typo
 
-local rawGitBranches="$(git branch --format="$gitBranchFormat\n")"
+local rawGitBranches="$(git branch --sort=-committerdate --format="$gitBranchFormat\n")"
 local currentBranch="$(git-branch-current)"
 
 # Loop through all the raw output, and format/color them before adding them to

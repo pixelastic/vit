@@ -11,11 +11,6 @@
 # $ git-branch-distance origin/master origin/develop # Between two remote branches
 # $ git-branch-distance master                       # Between master and its remote
 # $ git-branch-distance                              # Between current branch and its remote
-#
-# Output:
-# First line is how many commits ahead the main branch is
-# Second line is how many commits behind the main branch is
-
 
 # Main branch, default to the current branch
 local branchSource="$1"
@@ -31,18 +26,20 @@ fi
 local branchDestination="$2"
 if [[ "$branchDestination" == "" ]]; then
   local remoteName="$(git-remote-current "$branchSource")"
-  local branchRemoteName="$(git-branch-remote-name "$branchName")"
-  branchDestination="${remoteName}/${branchRemoteName}"
+  local remoteBranch="$(git-remote-branch "$branchName")"
+  branchDestination="${remoteName}/${remoteBranch}"
 fi
 if ! git-branch-exists "$branchDestination"; then
   echo "✘ Branch $branchSource does not exist"
   exit 1
 fi
 
-echo $branchSource
-echo $branchDestination
+local distance=($(git rev-list --left-right --count $branchSource...$branchDestination 2>/dev/null| xargs -n1))
+if [[ "$distance" == "" ]]; then
+  exit
+fi
+local ahead=$distance[0]
+local behind=$distance[1]
 
-
-git rev-list --left-right --count $branchSource...$branchDestination \
-  | xargs -n1
+echo "ahead ${ahead:=0}, behind ${behind:=0}"
 

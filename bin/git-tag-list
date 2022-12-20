@@ -12,6 +12,11 @@ gitTagFormat+="%(committerdate:relative)${separator}"
 gitTagFormat+="%(contents:subject)${separator}"
 
 local rawGitTags="$(git tag --sort=-committerdate --format="$gitTagFormat\n")"
+# Stop if no tag
+if [[ "$rawGitTags" == "" ]]; then
+  echo "✘ No tags found"
+  exit
+fi
 
 # Loop through all the raw output, and format/color them before adding them to
 # the output

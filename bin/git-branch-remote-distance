@@ -20,7 +20,13 @@ if ! git-branch-exists "$branchSource"; then
   exit 1
 fi
 
-git branch --list -vv --no-color "$branchSource"
+local rawOutput="$(git branch --list -vv --no-color "$branchSource")"
+
+local ahead="$(echo "$rawOutput" | sed -n "s/.*ahead \([0-9]*\).*/\1/p")"
+local behind="$(echo "$rawOutput" | sed -n "s/.*behind \([0-9]*\).*/\1/p")"
+
+echo "ahead ${ahead:=0}, behind ${behind:=0}"
+
 
 
 

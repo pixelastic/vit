@@ -29,6 +29,9 @@ if [[ "$remoteUrl" == "" ]]; then
 fi
 
 git remote add "$remoteName" "$remoteUrl"
+# We also set pruning of this remote to true, so whenever we fetch it, it
+# updates the local cache of remote branches
+git config "remote.${remoteName}.prune" true
 
 local displayRemoteName="$(git-remote-colorize "$remoteName" --with-icon)"
 echo "Remote $displayRemoteName created"
