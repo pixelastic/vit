@@ -33,7 +33,7 @@ fi
 local branchPushStatus="$(git-branch-push-status $branchName)"
 
 if [[ $branchPushStatus = 'never_pushed' ]]; then
-  colorize " $branchName" blue7
+  colorize " $branchName" $branchColor
   exit
 fi
 
