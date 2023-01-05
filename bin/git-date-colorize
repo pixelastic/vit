@@ -24,14 +24,15 @@ displayDate="${displayDate/ months/mo}"
 displayDate="${displayDate/ weeks/w}"
 displayDate="${displayDate/ days/d}"
 displayDate="${displayDate/ hours/h}"
+displayDate="${displayDate/ minutes/mn}"
 # }}}
 
 # If --with-icon is not passed, we simply display the colored date
 if [[ "$argsf[--with-icon]" != 1 ]]; then
-  colorize "$displayDate" blue
+  colorize "$displayDate" SKY
   exit
 fi
 
 # Otherwise we add the icon
-colorize " $displayDate" blue
+colorize " $displayDate" SKY
 exit

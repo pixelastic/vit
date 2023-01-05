@@ -20,9 +20,9 @@ fi
 
 # If --with-icon is passed, we add an icon
 if [[ "$argsf[--with-icon]" == 1 ]]; then
-  colorize " $commitHash" indigo
+  colorize " $commitHash" NEUTRAL
   exit
 fi
 
-colorize "$commitHash" indigo
+colorize "$commitHash" NEUTRAL
 exit

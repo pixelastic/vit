@@ -25,9 +25,9 @@ if [[ $tagName == '' ]]; then
   exit 0
 fi
 
-# If --with-icon is not passed, we simply display the colored branch
+# If --with-icon is not passed, we simply display the colored tag
 if [[ "$argsf[--with-icon]" != 1 ]]; then
-  colorize $colorizeArguments "$tagName" pink
+  colorize $colorizeArguments "$tagName" TEAL
   exit
 fi
 
@@ -35,28 +35,28 @@ local tagStatus="$(git-tag-status "$tagName")"
 
 # Exact: The tag points specifically to the current commit
 if [[ "$tagStatus" = "exact" ]]; then
-  colorize " $tagName" teal4
+  colorize " $tagName" CYAN_5
   exit
 fi
 
 # Closest: The tag is the closest in the branch
 if [[ "$tagStatus" = "closest" ]]; then
-  colorize " $tagName" teal
+  colorize " $tagName" CYAN
   exit
 fi
 
 # Parent: The tag is somewhere in the branch
 if [[ "$tagStatus" = "parent" ]]; then
-  colorize "炙$tagName" teal8
+  colorize "炙$tagName" CYAN_8
   exit
 fi
 
 # Unrelated: The tag is not in the branch
 if [[ "$tagStatus" = "unrelated" ]]; then
-  colorize "炙$tagName" gray
+  colorize "炙$tagName" GRAY
   exit
 fi
 
 # Fallback on unknown status
-colorize " $tagName" red
+colorize " $tagName" RED
 exit

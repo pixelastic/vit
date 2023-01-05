@@ -57,7 +57,7 @@ while read -r rawGitBranch; do
   local row=""
   #  to mark the current branch {{{
   if [[ $branchName == $currentBranch ]]; then
-    row+="$(colorize  green)${separator}"
+    row+="$(colorize  GREEN)${separator}"
   else
     row+="$separator"
   fi

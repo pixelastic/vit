@@ -18,13 +18,12 @@ if [[ "$rawGitTags" == "" ]]; then
   exit
 fi
 
+
 # Loop through all the raw output, and format/color them before adding them to
 # the output
 local output=""
-while read -r rawGitTag; do
+for rawGitTag in ${(f)rawGitTags}; do
   # Splitting the line into its various parts
-  local textSplit="$(text-split "$rawGitTag" "$separator")"
-
   local splitLine=(${(f)"$(text-split "$rawGitTag" "$separator")"})
   local tagName="$splitLine[1]"
   local commitHash="$splitLine[2]"
@@ -43,14 +42,14 @@ while read -r rawGitTag; do
 
   # Date {{{
   relativeTime=${relativeTime/ ago/}
-  row+="$(git-date-colorize " $relativeTime" blue)${separator}"
+  row+="$(git-date-colorize "$relativeTime" --with-icon)${separator}"
   # }}}
 
   # Commit message {{{
-  row+="$(colorize "$commitMessage" gray)${separator}"
+  row+="$(git-message-colorize "$commitMessage")${separator}"
   # }}}
 
   output+="$row\n"
-done <<<$rawGitTags
+done
 
 echo $output | column --table-noheadings --separator "$separator" -t

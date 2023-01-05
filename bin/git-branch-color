@@ -10,14 +10,14 @@ if [[ $branchName == '' ]]; then
   branchName="$(git-branch-current)"
 fi
 
-local DEFAULT_BRANCH_COLOR='orange'
+local DEFAULT_BRANCH_COLOR='ORANGE'
 
 declare -A BRANCH_COLORS
 BRANCH_COLORS=()
-BRANCH_COLORS[HEAD]='red'
-BRANCH_COLORS[develop]='yellow'
-BRANCH_COLORS[master]='blue'
-BRANCH_COLORS[main]='blue'
+BRANCH_COLORS[HEAD]='RED'
+BRANCH_COLORS[develop]='YELLOW'
+BRANCH_COLORS[master]='BLUE'
+BRANCH_COLORS[main]='BLUE'
 
 # Known branch
 local knownColor=$BRANCH_COLORS[$branchName]

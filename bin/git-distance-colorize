@@ -14,7 +14,7 @@ local ahead="$(echo "$distance" | sed -n "s/.*ahead \([0-9]*\).*/\1/p")"
 local behind="$(echo "$distance" | sed -n "s/.*behind \([0-9]*\).*/\1/p")"
 
 local output=()
-[[ "$ahead" != "" ]] && [[ "$ahead" != 0 ]] && output+="$(colorize " $ahead" green)"
-[[ "$behind" != "" ]] && [[ "$behind" != 0 ]] && output+="$(colorize " $behind" red)"
+[[ "$ahead" != "" ]] && [[ "$ahead" != 0 ]] && output+="$(colorize " $ahead" GREEN)"
+[[ "$behind" != "" ]] && [[ "$behind" != 0 ]] && output+="$(colorize " $behind" RED)"
 
 echo $output

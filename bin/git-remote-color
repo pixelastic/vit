@@ -10,19 +10,19 @@ if [[ $remoteName == '' ]]; then
   remoteName="$(git-remote-current)"
 fi
 
-local DEFAULT_REMOTE_COLOR='yellow'
+local DEFAULT_REMOTE_COLOR='YELLOW'
 
 declare -A REMOTE_COLORS
 REMOTE_COLORS=()
-REMOTE_COLORS[HEAD]='red'
-REMOTE_COLORS[algolia]='blue4'
-REMOTE_COLORS[origin]='yellow'
-REMOTE_COLORS[pixelastic]='green'
-REMOTE_COLORS[upstream]='blue'
+REMOTE_COLORS[HEAD]='RED'
+REMOTE_COLORS[algolia]='BLUE_4'
+REMOTE_COLORS[origin]='YELLOW'
+REMOTE_COLORS[pixelastic]='GREEN'
+REMOTE_COLORS[upstream]='BLUE'
 
 # Remote doesn't exist
 if ! git-remote-exists "$remoteName"; then
-  echo red
+  echo RED
   exit
 fi
 

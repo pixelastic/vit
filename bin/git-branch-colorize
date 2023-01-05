@@ -43,28 +43,28 @@ if [[ $branchPushStatus = 'identical' ]]; then
 fi
 
 if [[ $branchPushStatus = 'ahead' ]]; then
-  colorize " $branchName" blue7
+  colorize " $branchName" BLUE
   exit
 fi
 
 if [[ $branchPushStatus = 'behind' ]]; then
-  colorize " $branchName" blue5
+  colorize " $branchName" BLUE_LIGHT
   exit
 fi
 
 if [[ $branchPushStatus = 'gone' ]]; then
-  colorize " $branchName" red5
+  colorize " $branchName" RED_LIGHT
   exit
 fi
 
 if [[ $branchPushStatus = 'diverged' ]]; then
-  colorize " $branchName" red
+  colorize " $branchName" RED
   exit
 fi
 
 if [[ $branchPushStatus = 'detached' ]]; then
   local currentCommit="$(git-commit-current)"
-  colorize " HEAD ($currentCommit)" red
+  colorize " HEAD ($currentCommit)" RED
   exit
 fi
 
