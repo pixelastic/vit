@@ -20,9 +20,9 @@ fi
 
 # If --with-icon is passed, we add an icon
 if [[ "$argsf[--with-icon]" == 1 ]]; then
-  colorize " $commitHash" NEUTRAL
+  colorize " $commitHash" ALIAS_GIT_COMMIT
   exit
 fi
 
-colorize "$commitHash" NEUTRAL
+colorize "$commitHash" ALIAS_GIT_COMMIT
 exit

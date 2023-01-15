@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+# Display an interactive list of all previous versions of the file
+# Usage:
+# $ git-file-history ./path/to/file
+
+local filepath="$1"
+
+# Build the display line
+local formatString=""
+formatString+="%C(${COLOR_ALIAS_GIT_COMMIT}) %h%Creset "
+formatString+="%C(${COLOR_ALIAS_GIT_MESSAGE})%s%Creset"
+
+# Find all commits where this file was modified
+local gitHistory="$(\
+git \
+  --no-pager \
+  log \
+  --format="$formatString" \
+  --color=always \
+  -- $filepath \
+)"
+
+# Open dynamic search in the list, along with a preview of the file
+local selection="$(
+  fzf \
+    --ansi \
+    --preview "git-file-history-preview {} "$filepath"" \
+    --preview-window=right \
+    <<< "$gitHistory"
+)"
+
+# Find the commit
+local commitHash="$(cut -d ' ' -f2 <<< "$selection")"
+
+git --no-pager show $commitHash:$filepath
+

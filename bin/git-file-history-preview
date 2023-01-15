@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+# Preview a file at a given revision in the git-file-history preview window
+local selection="$1"
+local filepath="$2"
+
+# Find the commit from parsing the selection
+local commitHash="$(cut -d ' ' -f2 <<< "$selection")"
+
+# Guess the language by parsing the extension
+local extension="${filepath:e}"
+
+# Show the file at this stage, with syntax highlight
+git show $commitHash:$filepath \
+  | bat \
+    --decorations=never \
+    --color=always \
+    --language=$extension
