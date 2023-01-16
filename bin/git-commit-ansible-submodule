@@ -2,6 +2,6 @@
 # Update the ./config/ansible/galactica submodule with message:
 # chore(pdf): Update ansible submodule
 
-cd $(git root)
+cd $(git-directory-root)
 git add ./config/ansible/galactica
 git commit -m "chore(ansible): Update ansible submodule"

@@ -2,6 +2,6 @@
 # Update the ./private submodule at the root of the repo with the message:
 # chore(private): Update private submodule
 
-cd $(git root)
+cd $(git-directory-root)
 git add ./private
 git commit -m "chore(private): Update private submodule"

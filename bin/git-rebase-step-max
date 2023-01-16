@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-gitRoot="$(git root)"
+gitRoot="$(git-directory-root)"
 rebaseDir="${gitRoot}/.git/rebase-apply"
 maxStep="${rebaseDir}/last"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
 # Check if current directory is a submodule
 
-cd "$(git root)/.."
+cd "$(git pwd)/.."
 git-is-repository

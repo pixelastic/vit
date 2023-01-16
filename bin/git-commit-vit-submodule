@@ -2,6 +2,6 @@
 # Update the ./scripts/bin/vit submodule with message:
 # chore(vit): Update vit submodule
 
-cd $(git root)
+cd $(git-directory-root)
 git add ./scripts/bin/vit
 git commit -m "chore(vit): Update vit submodule"

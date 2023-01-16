@@ -3,7 +3,7 @@
 
 local originCommit="$1"
 
-local gitRoot="$(git root)"
+local gitRoot="$(git-directory-root)"
 local beaconPatterns=("${gitRoot}/Gemfile", "${gitRoot}/*.gemspec")
 
 local updateCommand="bundle install"

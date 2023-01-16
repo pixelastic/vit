@@ -3,7 +3,7 @@
 
 local originCommit="$1"
 
-local gitRoot="$(git root)"
+local gitRoot="$(git-directory-root)"
 local beaconFilepath="${gitRoot}/yarn.lock"
 
 local updateCommand="yarn install"

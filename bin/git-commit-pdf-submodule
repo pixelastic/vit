@@ -2,6 +2,6 @@
 # Update the ./scripts/bin/pdf submodule with message:
 # chore(pdf): Update pdf submodule
 
-cd $(git root)
+cd $(git-directory-root)
 git add ./scripts/bin/pdf
 git commit -m "chore(pdf): Update pdf submodule"
