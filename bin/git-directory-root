@@ -15,7 +15,7 @@ done
 # Check from the given directory, or the current one if none specified
 local targetPath="$argsp[1]"
 [[ $targetPath == "" ]] && targetPath="$PWD"
-[[ -d "$targetPath" ]] && targetPath="${targetPath:r}"
+[[ ! -d "$targetPath" ]] && targetPath="${targetPath:r}"
 
 cd $targetPath
 local gitRoot="$(git pwd)"
