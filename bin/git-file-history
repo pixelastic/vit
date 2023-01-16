@@ -9,7 +9,8 @@ local gitPath="$(git-file-path "$absolutePath")"
 
 # Build the display line
 local formatString=""
-formatString+="%C(${COLOR_ALIAS_GIT_COMMIT}) %h%Creset "
+formatString+="%C(${COLOR_ALIAS_GIT_COMMIT}) %h%Creset  "
+formatString+="%C(${COLOR_ALIAS_DATE}) %cd%Creset  "
 formatString+="%C(${COLOR_ALIAS_GIT_MESSAGE})%s%Creset"
 
 # Find all commits where this file was modified
@@ -17,6 +18,7 @@ local gitHistory="$(\
 git \
   --no-pager \
   log \
+  --date=format:'%Y-%m-%d %H:%M:%S' \
   --format="$formatString" \
   --color=always \
   $absolutePath \
@@ -26,8 +28,8 @@ git \
 local selection="$(
   fzf \
     --ansi \
+    --preview-window 'right,50%,border-left,<79(bottom,80%,border-top)' \
     --preview "git-file-history-preview {} "$gitPath"" \
-    --preview-window=right \
     <<< "$gitHistory"
 )"
 

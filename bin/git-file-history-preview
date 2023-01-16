@@ -6,14 +6,12 @@ local gitPath="$2"
 # Find the commit from parsing the selection
 local commitHash="$(cut -d ' ' -f2 <<< "$selection")"
 
-# Guess the language by parsing the extension
-local extension="${gitPath:e}"
-local additionalFlags=""
-[[ "$extension" != "" ]] && additionalFlags="--language=$extension"
-
-# Show the file at this stage, with syntax highlight
-git show $commitHash:"$gitPath" \
+# Show the file at this stage, with diff highlight with current version
+git diff \
+  $commitHash:"$gitPath" \
+  :"$gitPath" \
+  | tail -n +5 \
   | bat \
-    --decorations=never \
+    --style=numbers \
     --color=always \
-    $additionalFlags
+    --language=diff
