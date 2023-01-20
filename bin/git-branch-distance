@@ -41,5 +41,5 @@ fi
 local ahead=$distance[0]
 local behind=$distance[1]
 
-echo "ahead ${ahead:=0}, behind ${behind:=0}"
+echo "ahead ${ahead:-0}, behind ${behind:-0}"
 
