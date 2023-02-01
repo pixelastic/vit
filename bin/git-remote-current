@@ -1,6 +1,0 @@
-#!/usr/bin/env zsh
-# Display name of current remote
-# Usage:
-# $ git-remote-current         # Name of current remote
-
-git-branch-remote

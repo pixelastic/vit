@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh
-# Check if currently in a .git folder
-
-local response="$(git rev-parse --is-inside-git-dir 2>/dev/null)"
-
-[[ "$response" == "true" ]] && exit 0
-exit 1

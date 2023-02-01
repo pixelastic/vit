@@ -1,8 +1,0 @@
-#!/usr/bin/env zsh
-# Display the current commit hash
-# Usage
-# $ git-commit-current     # Current commit hash
-
-git log \
-  --format='%h' \
-  --max-count 1
