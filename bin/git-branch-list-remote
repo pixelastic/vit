@@ -5,6 +5,12 @@
 # $ git-branch-list-remote origin     # List all remote branches on origin
 # $ git-branch-list-remote --all      # List all branches on all remotes
 # $ git-branch-list-remote --no-cache # Forces a refresh of data
+#
+# TODO: Add caching mechanism
+# TODO: Mark dependabot shorter
+# TODO: Fix mungling of author colors
+# TODO: USe better parsing of arguments
+# TODO: Use better looping of multi-line results
 
 # Filter positional arguments and flags
 local argsp=()
@@ -20,7 +26,7 @@ local currentRemote="$(git-remote-current)"
 local currentRemoteBranch="$currentRemote/$(git-remote-branch)"
 # }}}
 
-# By default, we list specific remote branches
+# Expected usage is to specific the remote to list branch from
 local remoteNames=($argsp[1])
 # If none is specified, we list the current remote branches
 [[ "${#remoteNames[@]}" == 0 ]] && remoteNames=($currentRemote)
@@ -83,39 +89,41 @@ for remoteName in $remoteNames; do
     local relativeTime="${splitRawRemoteBranch[3]:1}"
     local commitMessage="${splitRawRemoteBranch[4]:1}"
     # }}}
+    which colorize
 
     # Building the row display {{{
     # Currently tracked branch {{{
     if [[ "$remoteBranchName" == "$currentRemoteBranch" ]]; then
-      row+="$(colorize  green)${separator}"
+      row+="$(colorize  ALIAS_SUCCESS)${separator}"
     else
       row+="$separator"
     fi
     # Remote branch name {{{
     row+="$(git-remote-colorize "$remoteBranchName" --with-icon)${separator}"
     # }}}
-    # Commit hash {{{
-    row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
-    # }}}
-    # Ahead/behind {{{
-    local remoteDistance=$remoteDistances[$remoteBranchName]
-    row+="$(git-distance-colorize "$remoteDistance" --with-icon)${separator}"
-    # }}}
-    # Local branch name {{{
-    local localBranchName=$localBranchesNames[$remoteBranchName]
-    if [[ "$localBranchName" != "" ]]; then
-      row+="$(git-branch-colorize "$localBranchName" --with-icon)${separator}"
-    else
-      row+="$(colorize "untracked" gray8)${separator}"
-    fi
-    # }}}
-    # Date {{{
-    row+="$(git-date-colorize "$relativeTime" --with-icon)${separator}"
-    # }}}
-    # Commit message {{{
-    row+="$(git-message-colorize "$commitMessage")${separator}"
-    # }}}
-    # }}}
+    
+    # # Commit hash {{{
+    # row+="$(git-commit-colorize "$commitHash" --with-icon)${separator}"
+    # # }}}
+    # # Ahead/behind {{{
+    # local remoteDistance=$remoteDistances[$remoteBranchName]
+    # row+="$(git-distance-colorize "$remoteDistance" --with-icon)${separator}"
+    # # }}}
+    # # Local branch name {{{
+    # local localBranchName=$localBranchesNames[$remoteBranchName]
+    # if [[ "$localBranchName" != "" ]]; then
+    #   row+="$(git-branch-colorize "$localBranchName" --with-icon)${separator}"
+    # else
+    #   row+="$(colorize "untracked" gray8)${separator}"
+    # fi
+    # # }}}
+    # # Date {{{
+    # row+="$(git-date-colorize "$relativeTime" --with-icon)${separator}"
+    # # }}}
+    # # Commit message {{{
+    # row+="$(git-message-colorize "$commitMessage")${separator}"
+    # # }}}
+    # # }}}
 
     output+="$row\n"
   done <<<$rawRemoteBranches
